@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext(null);
 
@@ -57,21 +58,41 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(false);
         return { success: true };
       } else {
-        // Live login will be wired here with axios
-        // We will implement API endpoints later in api/client.js
-        throw new Error('Live API connection not configured yet');
+        const payload = { email, password };
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1/'}auth/login/`,
+          payload
+        );
+        const loginData = response.data;
+        if (loginData.success) {
+          const { access, refresh, user: apiUser } = loginData.data;
+          
+          localStorage.setItem('transitops_token', access);
+          localStorage.setItem('transitops_refresh_token', refresh);
+          localStorage.setItem('transitops_user', JSON.stringify(apiUser));
+          
+          setToken(access);
+          setUser(apiUser);
+          setIsLoading(false);
+          return { success: true };
+        } else {
+          throw new Error(loginData.error?.message || 'Login failed');
+        }
       }
     } catch (error) {
       setIsLoading(false);
+      // If error is from axios, format it
+      const errorMsg = error.response?.data?.error?.message || error.message || 'Login failed';
       return {
         success: false,
-        error: error.message || 'Login failed'
+        error: errorMsg
       };
     }
   };
 
   const logout = () => {
     localStorage.removeItem('transitops_token');
+    localStorage.removeItem('transitops_refresh_token');
     localStorage.removeItem('transitops_user');
     setToken(null);
     setUser(null);
