@@ -91,14 +91,22 @@ export const MaintenanceList = () => {
         ordering: sortBy
       };
       
-      const [logsRes, vehiclesRes] = await Promise.all([
-        getMaintenanceLogs(params),
-        getVehicles()
-      ]);
+      const canWrite = canCreateMaintenance || canUpdateMaintenance;
       
-      setLogs(logsRes.data || []);
-      setTotalItems(logsRes.meta?.total || logsRes.data?.length || 0);
-      setVehicles(vehiclesRes.data || []);
+      if (canWrite) {
+        const [logsRes, vehiclesRes] = await Promise.all([
+          getMaintenanceLogs(params),
+          getVehicles()
+        ]);
+        setLogs(logsRes.data || []);
+        setTotalItems(logsRes.meta?.total || logsRes.data?.length || 0);
+        setVehicles(vehiclesRes.data || []);
+      } else {
+        const logsRes = await getMaintenanceLogs(params);
+        setLogs(logsRes.data || []);
+        setTotalItems(logsRes.meta?.total || logsRes.data?.length || 0);
+        setVehicles([]);
+      }
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
