@@ -1,6 +1,6 @@
 # TransitOps
 
-Smart Transport Operations Platform
+=> Smart Transport Operations Platform
 
 ## Tech Stack
 
