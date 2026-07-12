@@ -17,10 +17,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write('Clearing existing data...')
-        Trip.objects.all().delete()
-        MaintenanceLog.objects.all().delete()
         FuelLog.objects.all().delete()
         Expense.objects.all().delete()
+        Trip.objects.all().delete()
+        MaintenanceLog.objects.all().delete()
         Driver.objects.all().delete()
         User.objects.all().delete()
         Vehicle.objects.all().delete()
