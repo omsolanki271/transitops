@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fuel Logs - TransitOps</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#00201c",
+                        "tertiary-container": "#007cb1",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#121c2a",
+                        "error-container": "#ffdad6",
+                        "on-background": "#121c2a",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#005ac2",
+                        "on-surface-variant": "#424754",
+                        "inverse-primary": "#adc6ff",
+                        "on-tertiary-fixed": "#001e2f",
+                        "surface-container-highest": "#d9e3f6",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-container": "#006f64",
+                        "inverse-surface": "#27313f",
+                        "secondary-fixed": "#71f8e4",
+                        "background": "#f8f9ff",
+                        "surface-variant": "#d9e3f6",
+                        "on-tertiary-fixed-variant": "#004c6e",
+                        "secondary-container": "#6df5e1",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-container": "#fcfcff",
+                        "surface-container-high": "#dee9fc",
+                        "surface": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e6eeff",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d0dbed",
+                        "tertiary": "#00628d",
+                        "primary": "#0058be",
+                        "on-primary-container": "#fefcff",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004395",
+                        "tertiary-fixed-dim": "#89ceff",
+                        "secondary": "#006b5f",
+                        "outline": "#727785",
+                        "tertiary-fixed": "#c9e6ff",
+                        "primary-fixed-dim": "#adc6ff",
+                        "outline-variant": "#c2c6d6",
+                        "on-secondary-fixed-variant": "#005048",
+                        "primary-container": "#2170e4",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#4fdbc8",
+                        "primary-fixed": "#d8e2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "sm": "1rem",
+                        "lg": "2rem",
+                        "container-margin": "24px",
+                        "xs": "0.5rem",
+                        "xl": "3rem",
+                        "base": "4px",
+                        "md": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "code": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "code": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        
+        .card-shadow { box-shadow: 0px 10px 30px rgba(0,0,0,0.04); }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0px 12px 36px rgba(0,0,0,0.06); }
+        
+        /* Area Chart CSS Implementation */
+        .chart-area {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            background: 
+                linear-gradient(to top, rgba(33, 112, 228, 0.2) 0%, rgba(33, 112, 228, 0) 100%);
+            clip-path: polygon(0 100%, 0 80%, 10% 60%, 20% 70%, 30% 50%, 40% 60%, 50% 40%, 60% 55%, 70% 30%, 80% 45%, 90% 20%, 100% 35%, 100% 100%);
+            border-top: 2px solid #2170e4;
+        }
+        .chart-grid {
+            background-size: 100% 50px;
+            background-image: linear-gradient(to bottom, transparent 49px, #e6eeff 50px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background flex min-h-screen">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col bg-inverse-surface dark:bg-surface-container-lowest shadow-sm w-[280px] h-screen fixed left-0 top-0 py-lg px-md z-20">
+<div class="mb-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-lg">TO</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary-fixed dark:text-primary">TransitOps</h1>
+<p class="font-label-md text-label-md text-outline-variant">Fleet Management</p>
+</div>
+</div>
+</div>
+<ul class="flex-1 space-y-2 overflow-y-auto mt-4">
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="directions_car">directions_car</span> Vehicle Management</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="person">person</span> Driver Management</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="route">route</span> Trip Management</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="build">build</span> Maintenance</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold font-label-md text-label-md translate-x-1 transition-transform duration-150" href="#"><span class="material-symbols-outlined fill" data-icon="local_gas_station">local_gas_station</span> Fuel Logs</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="payments">payments</span> Expenses</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="description">description</span> Reports</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="analytics">analytics</span> Analytics</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="notifications">notifications</span> Notifications</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="settings">settings</span> Settings</a></li>
+</ul>
+<div class="mt-auto pt-4 border-t border-outline-variant/20">
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="help">help</span> Support</a>
+<button class="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2 border border-outline-variant rounded-lg text-outline hover:bg-surface-variant/10 transition-colors font-label-md text-label-md">
+                Logout
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-0 md:ml-[280px] flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface-dim shadow-sm border-b border-outline-variant/20 flex justify-between items-center h-16 px-lg sticky top-0 z-10 w-full">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface-variant p-2"><span class="material-symbols-outlined">menu</span></button>
+<div class="relative hidden sm:block w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-surface-dim rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-all duration-200 p-2 rounded-full relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-all duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<button class="hidden sm:block bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:shadow-md transition-shadow">Quick Create</button>
+<div class="w-9 h-9 rounded-full bg-surface-variant border border-outline-variant overflow-hidden cursor-pointer">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Professional headshot of a female fleet manager looking confidently at the camera in a modern corporate office setting, bright light mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpYjPv_4lJdDpVnVVjOHsF5GOZX2TDFb-tVTfzhmvvKhQXrlNJIVcdUxYXs5aP8FC4LG8UNIWODCa_fcibwXnQPlU9Iv1dZ8DGla_-IVqIvqLAbk_mBpFqTRsl6w06iwzqi9bZZ3NOgJctu_TbmCuOTFx46qMxrl3FBh-BzFu8WfqOhsJMIXmTaSJFevr3O5R1F3DVQgAe449j1C13vm18eFrdNYEBWFnDvdOJ3d4fHXTCVwC8uxr6_A"/>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 p-gutter md:p-container-margin overflow-y-auto">
+<!-- Header Section -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-lg gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-background">Fuel Logs</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage and track fleet fuel consumption and expenses.</p>
+</div>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-6 py-3 rounded-xl font-label-md text-label-md font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined">add</span>
+                    Add Fuel Entry
+                </button>
+</div>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-lg">
+<!-- KPI 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-[24px] p-6 card-shadow card-hover transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl">payments</span>
+</div>
+<span class="bg-secondary-container/30 text-on-secondary-container px-2 py-1 rounded-md text-xs font-bold">+12% vs last month</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant">Total Fuel Cost</p>
+<h3 class="font-headline-lg text-headline-lg font-bold text-on-background mt-1">$45,230</h3>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-[24px] p-6 card-shadow card-hover transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary-container">
+<span class="material-symbols-outlined text-3xl">oil_barrel</span>
+</div>
+<span class="bg-secondary-container/30 text-on-secondary-container px-2 py-1 rounded-md text-xs font-bold">+5% vs last month</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant">Total Volume (Gallons)</p>
+<h3 class="font-headline-lg text-headline-lg font-bold text-on-background mt-1">12,450</h3>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-[24px] p-6 card-shadow card-hover transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-full bg-surface-tint/20 flex items-center justify-center text-surface-tint">
+<span class="material-symbols-outlined text-3xl">sell</span>
+</div>
+<span class="bg-error-container/50 text-on-error-container px-2 py-1 rounded-md text-xs font-bold">+0.15 vs last month</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant">Avg Fuel Price</p>
+<h3 class="font-headline-lg text-headline-lg font-bold text-on-background mt-1">$3.63/gal</h3>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-[24px] p-6 card-shadow card-hover transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl">speed</span>
+</div>
+<span class="bg-outline-variant/30 text-on-surface-variant px-2 py-1 rounded-md text-xs font-bold">Stable</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant">Avg MPG</p>
+<h3 class="font-headline-lg text-headline-lg font-bold text-on-background mt-1">6.8</h3>
+</div>
+</div>
+<!-- Bento Grid Content -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Chart Section (Spans 2 columns) -->
+<div class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant/20 rounded-[24px] p-6 card-shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-md text-headline-md font-bold text-on-background">Fuel Consumption (30 Days)</h3>
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-surface-container-high rounded-md text-sm font-medium text-on-surface">30D</button>
+<button class="px-3 py-1 bg-transparent hover:bg-surface-container rounded-md text-sm font-medium text-outline">90D</button>
+<button class="px-3 py-1 bg-transparent hover:bg-surface-container rounded-md text-sm font-medium text-outline">1Y</button>
+</div>
+</div>
+<div class="chart-grid relative w-full h-[250px] border-b border-outline-variant/20 border-l">
+<!-- Y-Axis Labels -->
+<div class="absolute -left-8 top-0 h-full flex flex-col justify-between text-xs text-outline py-2">
+<span>500</span>
+<span>400</span>
+<span>300</span>
+<span>200</span>
+<span>100</span>
+<span>0</span>
+</div>
+<!-- The CSS Area Chart -->
+<div class="chart-area absolute bottom-0 left-0 w-full h-full opacity-80"></div>
+<!-- X-Axis Labels -->
+<div class="absolute -bottom-6 left-0 w-full flex justify-between text-xs text-outline px-4">
+<span>1st</span>
+<span>8th</span>
+<span>15th</span>
+<span>22nd</span>
+<span>30th</span>
+</div>
+</div>
+</div>
+<!-- Filters & Quick Actions -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-[24px] p-6 card-shadow flex flex-col">
+<h3 class="font-headline-md text-headline-md font-bold text-on-background mb-4">Filters</h3>
+<div class="space-y-4 flex-1">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">Vehicle</label>
+<select class="w-full bg-surface-container-low border border-surface-dim rounded-[12px] px-4 py-2 text-on-background focus:ring-2 focus:ring-primary focus:border-primary">
+<option>All Vehicles</option>
+<option>Truck #101</option>
+<option>Van #204</option>
+</select>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">Driver</label>
+<select class="w-full bg-surface-container-low border border-surface-dim rounded-[12px] px-4 py-2 text-on-background focus:ring-2 focus:ring-primary focus:border-primary">
+<option>All Drivers</option>
+<option>John Smith</option>
+<option>Sarah Jenkins</option>
+</select>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">Date Range</label>
+<input class="w-full bg-surface-container-low border border-surface-dim rounded-[12px] px-4 py-2 text-on-background focus:ring-2 focus:ring-primary focus:border-primary mb-2" type="date"/>
+<input class="w-full bg-surface-container-low border border-surface-dim rounded-[12px] px-4 py-2 text-on-background focus:ring-2 focus:ring-primary focus:border-primary" type="date"/>
+</div>
+</div>
+<button class="w-full mt-6 bg-surface-container border border-outline-variant/30 text-primary py-2 rounded-[12px] font-label-md text-label-md hover:bg-surface-container-high transition-colors">Apply Filters</button>
+</div>
+<!-- Detailed Table Section -->
+<div class="lg:col-span-3 bg-surface-container-lowest border border-outline-variant/20 rounded-[24px] shadow-sm overflow-hidden mt-2">
+<div class="p-6 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-highest/30">
+<h3 class="font-headline-md text-headline-md font-bold text-on-background">Fuel History</h3>
+<button class="text-primary font-label-md text-label-md hover:underline flex items-center gap-1">
+                            Export CSV <span class="material-symbols-outlined text-sm">download</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md border-b border-outline-variant/20">
+<th class="p-4 font-semibold">Date</th>
+<th class="p-4 font-semibold">Vehicle</th>
+<th class="p-4 font-semibold">Driver</th>
+<th class="p-4 font-semibold">Station</th>
+<th class="p-4 font-semibold">Fuel Type</th>
+<th class="p-4 font-semibold text-right">Volume</th>
+<th class="p-4 font-semibold text-right">Price/Gal</th>
+<th class="p-4 font-semibold text-right">Total Cost</th>
+<th class="p-4 font-semibold text-center">Actions</th>
+</tr>
+</thead>
+<tbody class="text-body-sm font-body-md text-on-background divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-variant/5 transition-colors group">
+<td class="p-4 text-outline-variant whitespace-nowrap">Oct 24, 2023 08:30</td>
+<td class="p-4 font-medium"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-primary"></span> TRK-101</div></td>
+<td class="p-4">John Smith</td>
+<td class="p-4 text-outline">Pilot Travel Center #44</td>
+<td class="p-4"><span class="bg-surface-dim px-2 py-1 rounded text-xs">Diesel</span></td>
+<td class="p-4 text-right font-medium">120.5 gal</td>
+<td class="p-4 text-right">$3.89</td>
+<td class="p-4 text-right font-bold text-on-surface">$468.75</td>
+<td class="p-4 text-center">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-variant/5 transition-colors group">
+<td class="p-4 text-outline-variant whitespace-nowrap">Oct 23, 2023 14:15</td>
+<td class="p-4 font-medium"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-secondary"></span> VAN-204</div></td>
+<td class="p-4">Sarah Jenkins</td>
+<td class="p-4 text-outline">Shell Station North</td>
+<td class="p-4"><span class="bg-surface-dim px-2 py-1 rounded text-xs">Unleaded</span></td>
+<td class="p-4 text-right font-medium">18.2 gal</td>
+<td class="p-4 text-right">$3.45</td>
+<td class="p-4 text-right font-bold text-on-surface">$62.79</td>
+<td class="p-4 text-center">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-variant/5 transition-colors group">
+<td class="p-4 text-outline-variant whitespace-nowrap">Oct 23, 2023 09:00</td>
+<td class="p-4 font-medium"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-primary"></span> TRK-105</div></td>
+<td class="p-4">Mike Davis</td>
+<td class="p-4 text-outline">Love's Travel Stop</td>
+<td class="p-4"><span class="bg-surface-dim px-2 py-1 rounded text-xs">Diesel</span></td>
+<td class="p-4 text-right font-medium">95.0 gal</td>
+<td class="p-4 text-right">$3.91</td>
+<td class="p-4 text-right font-bold text-on-surface">$371.45</td>
+<td class="p-4 text-center">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-4 border-t border-outline-variant/20 flex items-center justify-between bg-surface-container-lowest">
+<span class="text-sm text-outline font-body-md">Showing 1-3 of 450 entries</span>
+<div class="flex gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/30 text-outline disabled:opacity-50"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-primary text-on-primary">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/30 hover:bg-surface-variant/20">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/30 hover:bg-surface-variant/20">3</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/30 text-outline"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

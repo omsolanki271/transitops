@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps - Add Vehicle</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "outline": "#727785",
+                    "on-tertiary-container": "#fcfcff",
+                    "on-primary-fixed": "#001a42",
+                    "on-surface-variant": "#424754",
+                    "outline-variant": "#c2c6d6",
+                    "tertiary-container": "#007cb1",
+                    "secondary": "#006b5f",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#d9e3f6",
+                    "primary-fixed": "#d8e2ff",
+                    "primary-container": "#2170e4",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-secondary-container": "#006f64",
+                    "on-surface": "#121c2a",
+                    "surface-container-low": "#eff4ff",
+                    "on-tertiary-fixed-variant": "#004c6e",
+                    "tertiary-fixed-dim": "#89ceff",
+                    "background": "#f8f9ff",
+                    "surface-container-high": "#dee9fc",
+                    "secondary-container": "#6df5e1",
+                    "tertiary": "#00628d",
+                    "surface-container-highest": "#d9e3f6",
+                    "tertiary-fixed": "#c9e6ff",
+                    "on-secondary-fixed-variant": "#005048",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-background": "#121c2a",
+                    "secondary-fixed": "#71f8e4",
+                    "surface-tint": "#005ac2",
+                    "inverse-on-surface": "#eaf1ff",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed-dim": "#adc6ff",
+                    "surface-dim": "#d0dbed",
+                    "on-tertiary-fixed": "#001e2f",
+                    "surface-container": "#e6eeff",
+                    "secondary-fixed-dim": "#4fdbc8",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#fefcff",
+                    "primary": "#0058be",
+                    "surface": "#f8f9ff",
+                    "inverse-surface": "#27313f",
+                    "on-secondary-fixed": "#00201c",
+                    "inverse-primary": "#adc6ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "2rem",
+                    "base": "4px",
+                    "container-margin": "24px",
+                    "gutter": "16px",
+                    "md": "1.5rem",
+                    "sm": "1rem",
+                    "xl": "3rem",
+                    "xs": "0.5rem"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "code": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "code": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f8f9ff;
+            color: #121c2a;
+        }
+        .soft-shadow {
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.04);
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #0058be 0%, #006b5f 100%);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-gradient:hover {
+            box-shadow: 0px 4px 12px rgba(0, 88, 190, 0.3);
+            transform: translateY(-2px);
+        }
+        .form-input {
+            border: 1px solid #d0dbed;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s;
+            width: 100%;
+            background-color: #ffffff;
+            color: #121c2a;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #0058be;
+            box-shadow: 0 0 0 3px rgba(0, 88, 190, 0.2);
+        }
+        .file-upload-zone {
+            border: 2px dashed #c2c6d6;
+            border-radius: 12px;
+            transition: all 0.2s;
+            background-color: #f8f9ff;
+        }
+        .file-upload-zone:hover {
+            border-color: #0058be;
+            background-color: #eff4ff;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="w-[280px] h-screen fixed left-0 top-0 bg-inverse-surface dark:bg-surface-container-lowest shadow-sm flex flex-col h-full py-lg px-md z-20 md:flex hidden">
+<div class="mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary-fixed dark:text-primary">TransitOps</h1>
+<p class="font-label-md text-label-md text-outline-variant mt-1">Fleet Management</p>
+</div>
+<div class="flex-1 overflow-y-auto space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold translate-x-1 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="directions_car" style="font-variation-settings: 'FILL' 1;">directions_car</span>
+<span class="font-label-md text-label-md">Vehicle Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Driver Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="route">route</span>
+<span class="font-label-md text-label-md">Trip Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+<span class="font-label-md text-label-md">Maintenance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="local_gas_station">local_gas_station</span>
+<span class="font-label-md text-label-md">Fuel Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-md text-label-md">Expenses</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<div class="mt-auto pt-lg border-t border-outline-variant/20">
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg mb-2" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<button class="w-full flex items-center justify-center gap-2 py-3 text-error hover:bg-error-container/20 rounded-lg transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Logout
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-[280px] flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="docked full-width top-0 sticky bg-surface dark:bg-surface-dim shadow-sm border-b border-outline-variant/20 flex justify-between items-center h-16 px-lg z-10 w-full">
+<div class="flex items-center gap-4">
+<div class="md:hidden">
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+</div>
+<div class="hidden md:flex items-center bg-surface-container-high rounded-full px-4 py-2">
+<span class="material-symbols-outlined text-on-surface-variant mr-2 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md font-body-md text-on-surface w-64 placeholder-on-surface-variant/50 p-0" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="btn-gradient text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hidden md:block">Quick Create</button>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold overflow-hidden cursor-pointer">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A highly detailed close-up portrait of a professional fleet manager in a modern office. Bright, high-key lighting, crisp corporate minimalism aesthetic. Clean background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb-R-vXtqO6miVcWi4eH1GyQhHQReneVQciDNfRmAy2Yj7AAK-M0oVT2fBYxbwr_BAEgUQi6DUybv8HcaREZcQ17YjVShyO622V96QZuv6dbcFCVqfXwjiSKi9ltA-dC_83usLygv08wSsbKVfZWeQIIA46vLuZVjo7cTSug5Cr7e_iYXjC7kxjYutV4cyub4QGVVaE6enZ7tBLUVqgllG7XPBC8CvB2d-66VhPawUyteSRYtoCLZ64Q"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-lg md:p-container-margin max-w-[1200px] w-full mx-auto">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Add New Vehicle</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Register a new asset to your fleet network.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-3 rounded-xl border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md">Cancel</button>
+<button class="px-6 py-3 rounded-xl btn-gradient text-on-primary font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">save</span>
+                        Save Vehicle
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Form Details -->
+<div class="lg:col-span-8 space-y-6">
+<div class="bg-surface-container-lowest rounded-xl p-6 soft-shadow border border-outline-variant/10">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6 border-b border-surface-variant pb-4">General Information</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block">Registration Number *</label>
+<input class="form-input" placeholder="e.g. ABC-1234" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block">Vehicle Name / Identifier</label>
+<input class="form-input" placeholder="e.g. Unit 05 - Heavy Hauler" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block">Vehicle Type *</label>
+<select class="form-input appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[length:12px_12px] bg-[right_1rem_center]">
+<option disabled="" selected="" value="">Select type</option>
+<option value="truck">Heavy Truck</option>
+<option value="van">Delivery Van</option>
+<option value="car">Sedan</option>
+<option value="specialty">Specialty Equipment</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block">Status</label>
+<select class="form-input appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[length:12px_12px] bg-[right_1rem_center]">
+<option selected="" value="active">Active</option>
+<option value="maintenance">In Maintenance</option>
+<option value="out_of_service">Out of Service</option>
+</select>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-6 soft-shadow border border-outline-variant/10">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6 border-b border-surface-variant pb-4">Operational Metrics</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block">Capacity (kg/lbs)</label>
+<div class="relative">
+<input class="form-input pl-10" placeholder="0.00" type="number"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-sm">weight</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block">Initial Odometer</label>
+<div class="relative">
+<input class="form-input pl-10" placeholder="0" type="number"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-sm">speed</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block">Acquisition Cost</label>
+<div class="relative">
+<input class="form-input pl-10" placeholder="0.00" type="number"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-sm">attach_money</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block">Assigned Region</label>
+<select class="form-input appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[length:12px_12px] bg-[right_1rem_center]">
+<option disabled="" selected="" value="">Select region</option>
+<option value="north">North District</option>
+<option value="south">South District</option>
+<option value="east">East District</option>
+<option value="west">West District</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Media & Actions -->
+<div class="lg:col-span-4 space-y-6">
+<div class="bg-surface-container-lowest rounded-xl p-6 soft-shadow border border-outline-variant/10">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Vehicle Photo</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 text-sm">Upload a clear side-profile photo of the vehicle for easy identification.</p>
+<div class="file-upload-zone flex flex-col items-center justify-center p-8 cursor-pointer group">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary text-3xl group-hover:text-on-primary-container transition-colors">add_photo_alternate</span>
+</div>
+<span class="font-label-md text-label-md text-primary group-hover:text-primary-fixed-variant">Click to upload</span>
+<span class="font-body-md text-body-md text-outline text-xs mt-2">or drag and drop</span>
+<span class="font-body-md text-body-md text-outline text-xs mt-1">SVG, PNG, JPG or GIF (max. 800x400px)</span>
+<input accept="image/*" class="hidden" type="file"/>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/20">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-1">info</span>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">Onboarding Tips</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Ensure the registration number matches official documents exactly. This is used for automated toll and compliance checks.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

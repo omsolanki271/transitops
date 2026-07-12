@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps - Driver Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "outline": "#727785",
+                      "on-tertiary-container": "#fcfcff",
+                      "on-primary-fixed": "#001a42",
+                      "on-surface-variant": "#424754",
+                      "outline-variant": "#c2c6d6",
+                      "tertiary-container": "#007cb1",
+                      "secondary": "#006b5f",
+                      "on-error-container": "#93000a",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-variant": "#d9e3f6",
+                      "primary-fixed": "#d8e2ff",
+                      "primary-container": "#2170e4",
+                      "on-error": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#006f64",
+                      "on-surface": "#121c2a",
+                      "surface-container-low": "#eff4ff",
+                      "on-tertiary-fixed-variant": "#004c6e",
+                      "tertiary-fixed-dim": "#89ceff",
+                      "background": "#f8f9ff",
+                      "surface-container-high": "#dee9fc",
+                      "secondary-container": "#6df5e1",
+                      "tertiary": "#00628d",
+                      "surface-container-highest": "#d9e3f6",
+                      "tertiary-fixed": "#c9e6ff",
+                      "on-secondary-fixed-variant": "#005048",
+                      "on-primary-fixed-variant": "#004395",
+                      "on-background": "#121c2a",
+                      "secondary-fixed": "#71f8e4",
+                      "surface-tint": "#005ac2",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-bright": "#f8f9ff",
+                      "primary-fixed-dim": "#adc6ff",
+                      "surface-dim": "#d0dbed",
+                      "on-tertiary-fixed": "#001e2f",
+                      "surface-container": "#e6eeff",
+                      "secondary-fixed-dim": "#4fdbc8",
+                      "on-primary": "#ffffff",
+                      "on-primary-container": "#fefcff",
+                      "primary": "#0058be",
+                      "surface": "#f8f9ff",
+                      "inverse-surface": "#27313f",
+                      "on-secondary-fixed": "#00201c",
+                      "inverse-primary": "#adc6ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "2rem",
+                      "base": "4px",
+                      "container-margin": "24px",
+                      "gutter": "16px",
+                      "md": "1.5rem",
+                      "sm": "1rem",
+                      "xl": "3rem",
+                      "xs": "0.5rem"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "code": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "code": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: theme('colors.outline-variant');
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .soft-shadow {
+             box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        }
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="w-[280px] h-screen fixed left-0 top-0 bg-inverse-surface dark:bg-surface-container-lowest shadow-sm flex flex-col py-lg px-md z-20">
+<div class="mb-lg px-4">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary-fixed dark:text-primary">TransitOps</h1>
+<p class="text-on-surface-variant text-sm mt-1">Fleet Management</p>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="directions_car">directions_car</span>
+<span class="font-label-md text-label-md">Vehicle Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold translate-x-1 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Driver Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="route">route</span>
+<span class="font-label-md text-label-md">Trip Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+<span class="font-label-md text-label-md">Maintenance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="local_gas_station">local_gas_station</span>
+<span class="font-label-md text-label-md">Fuel Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-md text-label-md">Expenses</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/20 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<button class="flex items-center gap-3 px-4 py-3 text-error hover:bg-error/10 transition-colors duration-200 rounded-lg mt-2 w-full text-left">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-[280px] h-screen flex flex-col bg-surface relative">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center h-16 px-lg w-full bg-surface shadow-sm border-b border-outline-variant/20 z-10 sticky top-0 shrink-0">
+<!-- Search -->
+<div class="flex-1 max-w-md relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline-variant group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2 border border-outline-variant rounded-full leading-5 bg-surface-container-lowest text-on-surface placeholder-outline-variant focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm transition-shadow" placeholder="Search drivers by name, ID, or route..." type="text"/>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<div class="h-6 w-px bg-outline-variant/50 mx-2"></div>
+<button class="bg-gradient-to-r from-primary to-surface-tint text-on-primary px-6 py-2 rounded-full font-label-md text-label-md flex items-center gap-2 hover:shadow-md hover:-translate-y-[1px] transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Quick Create
+                </button>
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container-highest cursor-pointer ml-2" data-alt="A professional headshot of a corporate fleet manager in a modern office setting. Bright, clear lighting, light mode aesthetic, clean white background. High resolution, realistic portrait." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqTBG-dEemJMPKVLqQuaWmqFSQkp9-_r9d4GRtViWpXQHVW1otIKCAKOooszlx744_XW9PuLS7HprI1QyLwyZjUqvMZIcNknUpGkmkhEJC1_3SZq2NCo6bZoPdTcfx0ydirt3-HyFuwSQWH9JMB0XCmEE3N3qTZgRvbxoDNFjgxdODo5uSnH8yD-Uvgj9s5zJzwMDdpTBx003rpNNXB5o-vyBhZQJ4eYrtLXfZu0opGqg_WjkcLLdLwA"/>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-lg">
+<!-- Page Header & Controls -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-container-margin gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Driver Management</h2>
+<p class="text-on-surface-variant font-body-md mt-1">Manage fleet personnel, verify licenses, and monitor safety scores.</p>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-low p-1 rounded-lg border border-outline-variant/30">
+<button class="p-2 bg-surface-container-lowest shadow-sm rounded-md text-primary flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="p-2 text-outline-variant hover:text-on-surface rounded-md flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined">table_rows</span>
+</button>
+<div class="w-px h-6 bg-outline-variant/30 mx-1"></div>
+<button class="px-3 py-1.5 text-on-surface-variant font-label-md flex items-center gap-2 hover:bg-surface-variant/50 rounded-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+</div>
+</div>
+<!-- Driver Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-container-margin">
+<!-- Driver Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 p-5 soft-shadow hover-lift flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-secondary-container/20 rounded-bl-full -mr-4 -mt-4 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="flex gap-4">
+<div class="relative">
+<img class="w-14 h-14 rounded-full object-cover border-2 border-surface-container" data-alt="A portrait of a confident male truck driver in his 40s wearing a blue uniform shirt. Bright, clean lighting, light mode aesthetic, corporate professional style. High resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzKDeijbc14kM5OyjL3S9-RwJKQOra0b1Ns2ELjOLl6nypt5P2eTA4sYNNc8e0Bh4m7-39x4NGSpIsD3t-gKhKyj4R1L0IGEd-nZe1iUrqk8XM7RvOIBQSi5Q9swFz2TXYT7RuvOZNCrhAeNQBwtvyITWCV7zspQCESfcAau_fln7w49foaYWRgVrFPPWJ4wdwMHORnLEVaCB6gILwG8pu6OGdf6orPxXYN13uJ9rNi4e8SNQfy7rrTA"/>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-secondary rounded-full border-2 border-surface-container-lowest" title="Available"></span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">Marcus Johnson</h3>
+<p class="text-outline text-sm">ID: DRV-7742</p>
+</div>
+</div>
+<button class="text-outline-variant hover:text-on-surface transition-colors p-1">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-5">
+<div class="bg-surface-container-low rounded-lg p-3 border border-outline-variant/10">
+<div class="text-xs text-outline-variant font-label-md mb-1 uppercase tracking-wider">License Status</div>
+<div class="flex items-center gap-1.5 text-secondary font-medium">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                                Valid (Class A)
+                            </div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 border border-outline-variant/10">
+<div class="text-xs text-outline-variant font-label-md mb-1 uppercase tracking-wider">Safety Score</div>
+<div class="flex items-center gap-1.5 text-primary font-bold">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container">stars</span>
+                                98/100
+                            </div>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<div class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+                            Last active: 2h ago
+                        </div>
+<button class="text-primary font-label-md text-sm hover:underline">View Profile</button>
+</div>
+</div>
+<!-- Driver Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 p-5 soft-shadow hover-lift flex flex-col relative overflow-hidden">
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="flex gap-4">
+<div class="relative">
+<img class="w-14 h-14 rounded-full object-cover border-2 border-surface-container" data-alt="A portrait of a professional female delivery driver in her 30s wearing a company polo. Bright, clean lighting, light mode aesthetic, corporate professional style. High resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxKIw9ihUxmP7ibo4I0fAAv5mLjDxNSBIAOJtKvbwp_uPTRoHcJWSpCKW3poFUC8IdG7bsXwQDNin8NxAoynk-3vVksIUYVtJ9zEB2UxyAzvY6DaWsE2PSFprYXQFXhp5UQba5RN4X18YfNd9Tqm9lgsgIG9JBbbLRtPuX7TlWRZIN_5h5-0-ZUHoHelZz5TV6KgCP4LtBR3rkX6sFUA2kE5CXlijua2u7TVqSDXhEZSQWKUEK1klFPw"/>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-error rounded-full border-2 border-surface-container-lowest" title="On Leave"></span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">Sarah Chen</h3>
+<p class="text-outline text-sm">ID: DRV-8921</p>
+</div>
+</div>
+<button class="text-outline-variant hover:text-on-surface transition-colors p-1">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-5">
+<div class="bg-surface-container-low rounded-lg p-3 border border-outline-variant/10">
+<div class="text-xs text-outline-variant font-label-md mb-1 uppercase tracking-wider">License Status</div>
+<div class="flex items-center gap-1.5 text-secondary font-medium">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                                Valid (Class B)
+                            </div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 border border-outline-variant/10">
+<div class="text-xs text-outline-variant font-label-md mb-1 uppercase tracking-wider">Safety Score</div>
+<div class="flex items-center gap-1.5 text-primary font-bold">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container">stars</span>
+                                94/100
+                            </div>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<div class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+                            Last active: 1d ago
+                        </div>
+<button class="text-primary font-label-md text-sm hover:underline">View Profile</button>
+</div>
+</div>
+<!-- Driver Card 3 (Warning State) -->
+<div class="bg-surface-container-lowest rounded-xl border border-error-container p-5 soft-shadow hover-lift flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-error-container/30 rounded-bl-full -mr-4 -mt-4 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="flex gap-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-surface-variant flex items-center justify-center text-outline-variant border-2 border-surface-container">
+<span class="material-symbols-outlined text-2xl">person</span>
+</div>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#f59e0b] rounded-full border-2 border-surface-container-lowest" title="In Transit"></span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">David Rodriguez</h3>
+<p class="text-outline text-sm">ID: DRV-4412</p>
+</div>
+</div>
+<button class="text-outline-variant hover:text-on-surface transition-colors p-1">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-5">
+<div class="bg-error-container/20 rounded-lg p-3 border border-error-container/50">
+<div class="text-xs text-outline-variant font-label-md mb-1 uppercase tracking-wider">License Status</div>
+<div class="flex items-center gap-1.5 text-error font-medium text-sm">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                                Expires in 5 days
+                            </div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 border border-outline-variant/10">
+<div class="text-xs text-outline-variant font-label-md mb-1 uppercase tracking-wider">Safety Score</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-bold">
+<span class="material-symbols-outlined text-[18px] text-outline">stars</span>
+                                78/100
+                            </div>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<div class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-[#f59e0b]">route</span>
+                            On Route 4A
+                        </div>
+<button class="text-primary font-label-md text-sm hover:underline">View Profile</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

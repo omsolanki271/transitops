@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vehicle Details - TransitOps</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed": "#00201c",
+                      "tertiary-container": "#007cb1",
+                      "on-tertiary": "#ffffff",
+                      "on-surface": "#121c2a",
+                      "error-container": "#ffdad6",
+                      "on-background": "#121c2a",
+                      "error": "#ba1a1a",
+                      "on-error": "#ffffff",
+                      "surface-tint": "#005ac2",
+                      "on-surface-variant": "#424754",
+                      "inverse-primary": "#adc6ff",
+                      "on-tertiary-fixed": "#001e2f",
+                      "surface-container-highest": "#d9e3f6",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-bright": "#f8f9ff",
+                      "on-secondary-container": "#006f64",
+                      "inverse-surface": "#27313f",
+                      "secondary-fixed": "#71f8e4",
+                      "background": "#f8f9ff",
+                      "surface-variant": "#d9e3f6",
+                      "on-tertiary-fixed-variant": "#004c6e",
+                      "secondary-container": "#6df5e1",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed": "#001a42",
+                      "on-tertiary-container": "#fcfcff",
+                      "surface-container-high": "#dee9fc",
+                      "surface": "#f8f9ff",
+                      "surface-container-low": "#eff4ff",
+                      "surface-container": "#e6eeff",
+                      "on-primary": "#ffffff",
+                      "surface-dim": "#d0dbed",
+                      "tertiary": "#00628d",
+                      "primary": "#0058be",
+                      "on-primary-container": "#fefcff",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed-variant": "#004395",
+                      "tertiary-fixed-dim": "#89ceff",
+                      "secondary": "#006b5f",
+                      "outline": "#727785",
+                      "tertiary-fixed": "#c9e6ff",
+                      "primary-fixed-dim": "#adc6ff",
+                      "outline-variant": "#c2c6d6",
+                      "on-secondary-fixed-variant": "#005048",
+                      "primary-container": "#2170e4",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed-dim": "#4fdbc8",
+                      "primary-fixed": "#d8e2ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "sm": "1rem",
+                      "lg": "2rem",
+                      "container-margin": "24px",
+                      "xs": "0.5rem",
+                      "xl": "3rem",
+                      "base": "4px",
+                      "md": "1.5rem"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "code": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "code": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025); }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="w-[280px] h-screen fixed left-0 top-0 bg-inverse-surface shadow-sm z-50 flex flex-col py-lg px-md">
+<div class="mb-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary-fixed">TransitOps</h1>
+<p class="font-body-md text-body-md text-outline">Fleet Management</p>
+</div>
+<div class="flex-1 overflow-y-auto space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold translate-x-1 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">directions_car</span>
+<span class="font-label-md text-label-md">Vehicle Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Driver Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">route</span>
+<span class="font-label-md text-label-md">Trip Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">build</span>
+<span class="font-label-md text-label-md">Maintenance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">local_gas_station</span>
+<span class="font-label-md text-label-md">Fuel Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Expenses</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-md text-label-md">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<div class="mt-auto space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<button class="w-full text-left font-label-md text-label-md text-outline-variant px-4 py-3 hover:bg-surface-variant/10 rounded-lg">Logout</button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="ml-[280px] flex-1 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="docked full-width top-0 sticky bg-surface shadow-sm border-b border-outline-variant/20 flex justify-between items-center h-16 px-lg z-40">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 rounded-full bg-surface-container-highest border-none focus:ring-2 focus:ring-primary text-sm w-64 text-on-surface" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:shadow-md transition-shadow">Quick Create</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors"><span class="material-symbols-outlined">dark_mode</span></button>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWfsr0fzD4EWrUUzh6euCAckAwV5x1xiSr0g_zfV7E-kvE0vti644VfHDLjENS1Q7mOyHkdhdHoMf5r1sjLzKQ-OEMYjKXbQrWVLcbajmY5ZAoI3rJl072iDsbMq92GPLuuffXO4dBpS0rlRTkhFLRIVhklekB-ttd9rDE6VhIeLmI883Nh6m2GNygt8zB_aEAX-RptOQnLFK4G7ANn4JVPAdwAHFTOSV42XmNs9RM_ib0x80r-UEI7w"/>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-container-margin bg-background">
+<!-- Page Header -->
+<div class="flex justify-between items-start mb-lg">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="font-display-lg text-display-lg text-on-surface">TRK-982</h2>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Active</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant">2021 Volvo VNL 860</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-surface-container-high text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-container-highest transition-colors border border-outline-variant/30 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">edit</span> Edit
+                    </button>
+<button class="p-2 bg-surface-container-high text-on-surface rounded-lg hover:bg-surface-container-highest transition-colors border border-outline-variant/30">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column (Photos & Specs) - 5 cols -->
+<div class="lg:col-span-5 flex flex-col gap-gutter">
+<!-- Vehicle Photo -->
+<div class="glass-card rounded-xl overflow-hidden hover-lift h-64 relative group">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A high-quality, professional photograph of a modern white heavy-duty Volvo truck parked in a clean, brightly lit logistics yard during daytime. The image has a clean, premium, corporate aesthetic typical of a modern SaaS dashboard, utilizing soft natural light to highlight the vehicle's clean lines against a subtle, light-grey concrete background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWkVvL22LbGBqoqs8lXE_jSRs1JZjl2OAMxEFnrzUh_NTTSBDguKXGoPnRMDgK-eSaEitMrocYML4CEXAF5imV5b5fyvb8xLFqadOSifVW-pOGK6UZdekHVDFnQzRuTWtCze8UVh8Z2RHf1i2q1kil3hl-XonWbZSyLy8Qy21sR4sfScYuUq7-TxHVOFlIz1Fw6Yff1wT0UdbK8zVcHOj_YDFrg_gk-RUJP9_-3PyNI7bCP7DG3aJIhw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+</div>
+<!-- Specifications Card -->
+<div class="glass-card rounded-xl p-6 hover-lift flex-1">
+<h3 class="font-headline-md text-headline-md mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">info</span> Specifications
+                        </h3>
+<div class="grid grid-cols-2 gap-y-4 gap-x-6">
+<div>
+<p class="text-sm text-outline mb-1 font-medium">Make</p>
+<p class="font-body-md text-body-md text-on-surface">Volvo</p>
+</div>
+<div>
+<p class="text-sm text-outline mb-1 font-medium">Model</p>
+<p class="font-body-md text-body-md text-on-surface">VNL 860</p>
+</div>
+<div>
+<p class="text-sm text-outline mb-1 font-medium">Year</p>
+<p class="font-body-md text-body-md text-on-surface">2021</p>
+</div>
+<div>
+<p class="text-sm text-outline mb-1 font-medium">VIN</p>
+<p class="font-body-md text-body-md text-on-surface font-code">4V4NC9EH8MNXXXXXX</p>
+</div>
+<div>
+<p class="text-sm text-outline mb-1 font-medium">Fuel Tank</p>
+<p class="font-body-md text-body-md text-on-surface">150 Gallons</p>
+</div>
+<div>
+<p class="text-sm text-outline mb-1 font-medium">Load Capacity</p>
+<p class="font-body-md text-body-md text-on-surface">45,000 lbs</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Operations) - 7 cols -->
+<div class="lg:col-span-7 flex flex-col gap-gutter">
+<!-- Top Row: Mini Tables -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Maintenance History -->
+<div class="glass-card rounded-xl p-5 hover-lift">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md flex items-center gap-2 text-sm">
+<span class="material-symbols-outlined text-tertiary">build</span> Maintenance
+                                </h3>
+<a class="text-xs text-primary font-medium hover:underline" href="#">View All</a>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-sm border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface">Oil Change</span>
+<span class="text-outline text-xs">Oct 12, 2023</span>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface">Brake Inspection</span>
+<span class="text-outline text-xs">Sep 05, 2023</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface">Tire Rotation</span>
+<span class="text-outline text-xs">Aug 20, 2023</span>
+</div>
+</div>
+</div>
+<!-- Recent Trips -->
+<div class="glass-card rounded-xl p-5 hover-lift">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md flex items-center gap-2 text-sm">
+<span class="material-symbols-outlined text-secondary">route</span> Recent Trips
+                                </h3>
+<a class="text-xs text-primary font-medium hover:underline" href="#">View All</a>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-sm border-b border-outline-variant/20 pb-2">
+<div class="flex flex-col">
+<span class="text-on-surface">TRP-1042</span>
+<span class="text-outline text-xs">CHI → DET</span>
+</div>
+<span class="bg-surface-container-high px-2 py-1 rounded text-xs">Completed</span>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-outline-variant/20 pb-2">
+<div class="flex flex-col">
+<span class="text-on-surface">TRP-1038</span>
+<span class="text-outline text-xs">STL → CHI</span>
+</div>
+<span class="bg-surface-container-high px-2 py-1 rounded text-xs">Completed</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Expense Summary Chart Placeholder -->
+<div class="glass-card rounded-xl p-6 hover-lift flex-1 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">payments</span> Expense Summary (YTD)
+                            </h3>
+<select class="bg-surface-container-lowest border border-outline-variant/40 rounded-md text-sm py-1 px-2 text-on-surface focus:ring-primary focus:border-primary">
+<option>2023</option>
+<option>2022</option>
+</select>
+</div>
+<!-- Pseudo Chart Visual -->
+<div class="flex-1 flex items-end justify-between gap-2 mt-4 pt-4 border-t border-outline-variant/20 h-40">
+<div class="w-full bg-primary/20 rounded-t-sm h-[30%] hover:bg-primary/40 transition-colors relative group"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity bg-inverse-surface text-inverse-on-surface px-1 rounded">Jan</span></div>
+<div class="w-full bg-primary/20 rounded-t-sm h-[45%] hover:bg-primary/40 transition-colors"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[60%] hover:bg-primary/60 transition-colors relative group"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity bg-inverse-surface text-inverse-on-surface px-1 rounded">Mar</span></div>
+<div class="w-full bg-primary/20 rounded-t-sm h-[40%] hover:bg-primary/40 transition-colors"></div>
+<div class="w-full bg-primary/60 rounded-t-sm h-[80%] hover:bg-primary/80 transition-colors"></div>
+<div class="w-full bg-primary rounded-t-sm h-[95%] shadow-[0_0_8px_rgba(0,88,190,0.5)] relative group"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity bg-inverse-surface text-inverse-on-surface px-1 rounded">Jun</span></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[70%] hover:bg-primary/60 transition-colors"></div>
+<div class="w-full bg-primary/20 rounded-t-sm h-[50%] hover:bg-primary/40 transition-colors"></div>
+<div class="w-full bg-outline-variant/20 rounded-t-sm h-[10%]"></div>
+<div class="w-full bg-outline-variant/20 rounded-t-sm h-[10%]"></div>
+<div class="w-full bg-outline-variant/20 rounded-t-sm h-[10%]"></div>
+<div class="w-full bg-outline-variant/20 rounded-t-sm h-[10%]"></div>
+</div>
+<div class="flex justify-between text-xs text-outline mt-2 px-1">
+<span>Q1</span>
+<span>Q2</span>
+<span>Q3</span>
+<span>Q4</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

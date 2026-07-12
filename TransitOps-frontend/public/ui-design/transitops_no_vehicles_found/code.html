@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps - Vehicle Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "outline": "#727785",
+                    "on-tertiary-container": "#fcfcff",
+                    "on-primary-fixed": "#001a42",
+                    "on-surface-variant": "#424754",
+                    "outline-variant": "#c2c6d6",
+                    "tertiary-container": "#007cb1",
+                    "secondary": "#006b5f",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#d9e3f6",
+                    "primary-fixed": "#d8e2ff",
+                    "primary-container": "#2170e4",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-secondary-container": "#006f64",
+                    "on-surface": "#121c2a",
+                    "surface-container-low": "#eff4ff",
+                    "on-tertiary-fixed-variant": "#004c6e",
+                    "tertiary-fixed-dim": "#89ceff",
+                    "background": "#f8f9ff",
+                    "surface-container-high": "#dee9fc",
+                    "secondary-container": "#6df5e1",
+                    "tertiary": "#00628d",
+                    "surface-container-highest": "#d9e3f6",
+                    "tertiary-fixed": "#c9e6ff",
+                    "on-secondary-fixed-variant": "#005048",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-background": "#121c2a",
+                    "secondary-fixed": "#71f8e4",
+                    "surface-tint": "#005ac2",
+                    "inverse-on-surface": "#eaf1ff",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed-dim": "#adc6ff",
+                    "surface-dim": "#d0dbed",
+                    "on-tertiary-fixed": "#001e2f",
+                    "surface-container": "#e6eeff",
+                    "secondary-fixed-dim": "#4fdbc8",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#fefcff",
+                    "primary": "#0058be",
+                    "surface": "#f8f9ff",
+                    "inverse-surface": "#27313f",
+                    "on-secondary-fixed": "#00201c",
+                    "inverse-primary": "#adc6ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "2rem",
+                    "base": "4px",
+                    "container-margin": "24px",
+                    "gutter": "16px",
+                    "md": "1.5rem",
+                    "sm": "1rem",
+                    "xl": "3rem",
+                    "xs": "0.5rem"
+            },
+            "fontFamily": {
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "code": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Inter"
+                    ],
+                    "display-lg": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "code": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "500"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .gradient-btn {
+            background: linear-gradient(135deg, theme('colors.primary') 0%, theme('colors.secondary') 100%);
+            transition: all 0.3s ease;
+        }
+        .gradient-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 88, 190, 0.4);
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-full py-lg px-md w-[280px] fixed left-0 top-0 bg-inverse-surface dark:bg-surface-container-lowest shadow-sm z-50">
+<div class="mb-xl px-4">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary-fixed dark:text-primary">TransitOps</h1>
+<p class="font-label-md text-label-md text-outline">Fleet Management</p>
+</div>
+<ul class="flex flex-col gap-2 flex-grow overflow-y-auto">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold translate-x-1 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'wght' 600, 'FILL' 1;">directions_car</span>
+<span class="font-label-md text-label-md">Vehicle Management</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">person</span>
+<span class="font-label-md text-label-md">Driver Management</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">route</span>
+<span class="font-label-md text-label-md">Trip Management</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">build</span>
+<span class="font-label-md text-label-md">Maintenance</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">local_gas_station</span>
+<span class="font-label-md text-label-md">Fuel Logs</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">payments</span>
+<span class="font-label-md text-label-md">Expenses</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">notifications</span>
+<span class="font-label-md text-label-md">Notifications</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto pt-4 border-t border-outline-variant/20">
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:text-on-primary-fixed-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg group mb-2" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-on-primary-fixed-variant" style="font-variation-settings: 'wght' 400;">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<button class="w-full flex items-center justify-center gap-2 px-4 py-2 border border-outline-variant/30 rounded-lg text-outline-variant hover:bg-surface-variant/10 transition-colors">
+<span class="font-label-md text-label-md">Logout</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-[280px] w-full h-full overflow-hidden">
+<!-- TopNavBar -->
+<header class="docked full-width top-0 sticky bg-surface dark:bg-surface-dim shadow-sm border-b border-outline-variant/20 flex justify-between items-center h-16 px-lg z-40">
+<div class="flex items-center">
+<!-- Mobile Menu Toggle (Visible only on mobile) -->
+<button class="md:hidden mr-4 text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="relative w-64 md:w-96 hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 rounded-lg border border-outline-variant/30 bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md text-on-surface outline-none transition-all" placeholder="Search vehicles, drivers..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200 rounded-full hidden sm:block">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<div class="h-8 w-px bg-outline-variant/30 mx-2"></div>
+<button class="gradient-btn text-white px-4 py-2 rounded-lg font-label-md text-label-md hidden sm:block">
+                    Quick Create
+                </button>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-outline-variant/20 object-cover" data-alt="A clean, modern geometric avatar with soft lighting and a blue color scheme, representing a generic user profile icon in a corporate SaaS application setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv3G9kkOoe-RtQK3P178IerE5_FBxhI4PFZVte2bW2Scknk-PwuRMfIYbDK8snTnP6DqF8YZ5OKmEZfpvlEa8jyq_N4ghKBQwrIYMXw6DPXcwp6TtLahMK77Z0uUIBIPZQdmgkQuxsjXil-ZamIwVoJ1PMuQfk6aaM-IXX81jTDMNzPoKE322enL8oEH-TIuT0bdW-vTob4Oueb7DsSLgE2hXAH4Dy5LEUa8AzOWjDaBtRwyK9tiQSUA"/>
+</div>
+</header>
+<!-- Empty State Canvas -->
+<main class="flex-1 overflow-y-auto bg-background p-4 md:p-lg flex items-center justify-center">
+<div class="max-w-2xl w-full bg-surface-container-lowest rounded-xl shadow-[0px_10px_30px_rgba(0,0,0,0.04)] border border-white/10 p-8 md:p-12 flex flex-col items-center text-center transform transition-all duration-500 opacity-0 translate-y-4" id="empty-state-card">
+<!-- Illustration Area -->
+<div class="w-full max-w-[400px] h-64 mb-8 relative flex items-center justify-center">
+<!-- Decorative background shapes -->
+<div class="absolute inset-0 bg-surface-container-high rounded-full opacity-20 blur-3xl transform scale-150"></div>
+<div class="w-full h-full bg-contain bg-no-repeat bg-center relative z-10" data-alt="A sophisticated, minimalist 3D illustration of an empty modern transport hub or logistics garage. The scene is clean, airy, and features high-key lighting with a subtle blue and white corporate SaaS color palette. Soft shadows and smooth geometric surfaces emphasize order and readiness." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBwPAmwjfmmR1Mwf_fadBnVlXw64ErFMIM1Q4xGM272HgNzjINDfeLFCCbxA2NJhOKzR4_i3-mv69mtWzRTu4YKi0UpUbwOpKvCy9OomcxgsoNn_D1Ycw4LB4nO3WDlKhz8cP59dD9zYgmvsG5Iva2lRnR396vbl9-uQGZDRabSfohfJ1BGKNQba1SEgdC48qi99pQJzYMN63xYmp4MeNDn5bpCY3SfCoGF4n1eeZIqU5d4Kw4oBzAsWQ')"></div>
+</div>
+<!-- Text Content -->
+<h2 class="font-headline-lg md:font-headline-lg text-headline-lg md:text-headline-lg text-on-surface mb-4">No vehicles found</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md mb-8">
+                    Start managing your fleet by adding your first vehicle asset. You can track maintenance, fuel logs, and assign drivers once added.
+                </p>
+<!-- Action Area -->
+<div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+<button class="gradient-btn text-on-primary px-8 py-3 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 w-full sm:w-auto shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">add</span>
+                        Add New Vehicle
+                    </button>
+<button class="px-8 py-3 rounded-lg border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-low transition-colors w-full sm:w-auto flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">upload</span>
+                        Import CSV
+                    </button>
+</div>
+</div>
+</main>
+</div>
+<!-- Entrance Animation Script -->
+<script>
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const card = document.getElementById('empty-state-card');
+                if(card) {
+                    card.classList.remove('opacity-0', 'translate-y-4');
+                    card.classList.add('opacity-100', 'translate-y-0');
+                }
+            }, 100);
+        });
+    </script>
+</body></html>

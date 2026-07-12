@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps - Trip Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "outline": "#727785",
+                        "on-tertiary-container": "#fcfcff",
+                        "on-primary-fixed": "#001a42",
+                        "on-surface-variant": "#424754",
+                        "outline-variant": "#c2c6d6",
+                        "tertiary-container": "#007cb1",
+                        "secondary": "#006b5f",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#d9e3f6",
+                        "primary-fixed": "#d8e2ff",
+                        "primary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#006f64",
+                        "on-surface": "#121c2a",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed-variant": "#004c6e",
+                        "tertiary-fixed-dim": "#89ceff",
+                        "background": "#f8f9ff",
+                        "surface-container-high": "#dee9fc",
+                        "secondary-container": "#6df5e1",
+                        "tertiary": "#00628d",
+                        "surface-container-highest": "#d9e3f6",
+                        "tertiary-fixed": "#c9e6ff",
+                        "on-secondary-fixed-variant": "#005048",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-background": "#121c2a",
+                        "secondary-fixed": "#71f8e4",
+                        "surface-tint": "#005ac2",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-bright": "#f8f9ff",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface-dim": "#d0dbed",
+                        "on-tertiary-fixed": "#001e2f",
+                        "surface-container": "#e6eeff",
+                        "secondary-fixed-dim": "#4fdbc8",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#fefcff",
+                        "primary": "#0058be",
+                        "surface": "#f8f9ff",
+                        "inverse-surface": "#27313f",
+                        "on-secondary-fixed": "#00201c",
+                        "inverse-primary": "#adc6ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "2rem",
+                        "base": "4px",
+                        "container-margin": "24px",
+                        "gutter": "16px",
+                        "md": "1.5rem",
+                        "sm": "1rem",
+                        "xl": "3rem",
+                        "xs": "0.5rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "code": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "code": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom scrollbar for columns */
+        .kanban-col-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .kanban-col-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .kanban-col-scroll::-webkit-scrollbar-thumb {
+            background: #c2c6d6;
+            border-radius: 4px;
+        }
+        .kanban-col-scroll:hover::-webkit-scrollbar-thumb {
+            background: #727785;
+        }
+        
+        /* Drag and Drop visual feedback */
+        .kanban-card {
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1);
+        }
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.06);
+        }
+        .dragging {
+            opacity: 0.5;
+            transform: scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<nav class="w-[280px] h-screen fixed left-0 top-0 bg-inverse-surface shadow-sm flex flex-col py-lg px-md z-20 text-on-secondary hidden md:flex">
+<div class="mb-xl px-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center font-bold font-headline-md text-headline-md">
+                T
+            </div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary-fixed">TransitOps</h1>
+<p class="font-label-md text-label-md text-outline-variant">Fleet Management</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-2">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="directions_car">directions_car</span>
+                        Vehicle Management
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+                        Driver Management
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold font-label-md text-label-md translate-x-1 transition-transform duration-150 shadow-sm" href="#">
+<span class="material-symbols-outlined" data-icon="route">route</span>
+                        Trip Management
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+                        Maintenance
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="local_gas_station">local_gas_station</span>
+                        Fuel Logs
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+                        Expenses
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+                        Reports
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                        Analytics
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+                        Notifications
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                        Settings
+                    </a>
+</li>
+</ul>
+</div>
+<div class="mt-auto pt-6 border-t border-outline-variant/20">
+<ul class="space-y-2">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-outline-variant hover:bg-surface-variant/10 transition-colors duration-200 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                        Support
+                    </a>
+</li>
+</ul>
+<button class="mt-4 w-full flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container/10 transition-colors duration-200 rounded-lg font-label-md text-label-md">
+                Logout
+             </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col ml-0 md:ml-[280px] h-screen bg-background relative z-10 w-full overflow-hidden">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center h-16 px-lg w-full bg-surface shadow-sm border-b border-outline-variant/20 sticky top-0 z-10">
+<!-- Left Side: Brand (Mobile) & Search -->
+<div class="flex items-center gap-4 flex-1">
+<span class="md:hidden font-headline-md text-headline-md font-bold text-on-surface mr-2">TransitOps</span>
+<div class="relative w-full max-w-md hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 pl-10 pr-4 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Search trips, locations..." type="text"/>
+</div>
+</div>
+<!-- Right Side: Actions & Profile -->
+<div class="flex items-center gap-4">
+<button class="bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md font-semibold py-2 px-5 rounded-full shadow-sm transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                    Create Trip
+                </button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all hidden sm:block">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-tertiary-container overflow-hidden border border-outline-variant cursor-pointer">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a logistics manager in bright, natural office lighting, looking confident. High resolution, corporate modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWrnvUf2sOnl5C2tKMXAP9Yi2nfMpvgnoeyDb9lCLlLYCdXFCLVJEDyneCd2lXD76s7gfRQNGxhWcBaG6nIOYUzKvT6qBI-qimY8Dw1efQSHi12ebv8Op6LGpCA28ZnLOj92HyUPWzHMI_SLsESEPTYkH9q5nvj9X-kfNmzFjhpdSnWhCF2paKndOByh4ct9QWsbUY_RkIwLble09zikh1o3l1rKR8beKKqTcvRx-1V-5io107KbGfbA"/>
+</div>
+</div>
+</header>
+<!-- Kanban Board Container -->
+<main class="flex-1 overflow-x-auto overflow-y-hidden p-gutter lg:p-container-margin relative">
+<!-- Page Header / Controls -->
+<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Active Operations</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage and track real-time fleet movements.</p>
+</div>
+<div class="flex gap-2">
+<div class="bg-surface rounded-lg shadow-sm border border-outline-variant/50 p-1 flex">
+<button class="px-3 py-1.5 rounded-md bg-surface-container-highest text-on-surface font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="view_kanban">view_kanban</span> Kanban
+                        </button>
+<button class="px-3 py-1.5 rounded-md text-on-surface-variant hover:bg-surface-container-low font-label-md text-label-md flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="list">list</span> List
+                        </button>
+</div>
+<button class="p-2 bg-surface rounded-lg border border-outline-variant/50 text-on-surface-variant hover:bg-surface-container-low transition-colors shadow-sm">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Kanban Columns -->
+<div class="flex gap-6 h-[calc(100%-80px)] pb-4 min-w-[1200px]">
+<!-- Column: Draft -->
+<div class="flex-1 flex flex-col bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="p-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-outline"></div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">Draft</h3>
+<span class="bg-surface-container-high text-on-surface-variant text-xs px-2 py-0.5 rounded-full font-label-md">3</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[20px]" data-icon="more_horiz">more_horiz</span></button>
+</div>
+<div class="p-3 flex-1 overflow-y-auto kanban-col-scroll flex flex-col gap-3 bg-surface-container-low/30" id="col-draft" ondragover="allowDrop(event)" ondrop="drop(event)">
+<!-- Card 1 -->
+<div class="kanban-card bg-surface rounded-lg shadow-sm border border-outline-variant/30 p-4 cursor-grab" draggable="true" id="card-1" ondragstart="drag(event)">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-surface-container text-on-surface font-label-md text-[11px] px-2 py-1 rounded-md tracking-wide">TRP-8492</span>
+<span class="text-primary font-label-md text-[12px] font-bold">$1,250</span>
+</div>
+<h4 class="font-headline-md text-on-surface text-[16px] mb-1">Volvo VNL 860</h4>
+<div class="flex items-center gap-2 mb-4 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="package">package</span>
+<span class="font-body-md text-[13px]">Electronics • 14,000 lbs</span>
+</div>
+<div class="relative pl-6 mb-4">
+<div class="absolute left-2.5 top-2 bottom-2 w-0.5 bg-outline-variant/50 rounded-full"></div>
+<div class="mb-3 relative">
+<div class="absolute left-[-22px] top-1 w-2.5 h-2.5 rounded-full bg-outline border-2 border-surface"></div>
+<p class="font-label-md text-[12px] text-outline">Source</p>
+<p class="font-body-md text-[14px] text-on-surface">Seattle, WA</p>
+</div>
+<div class="relative">
+<div class="absolute left-[-22px] top-1 w-2.5 h-2.5 rounded-full bg-outline border-2 border-surface"></div>
+<p class="font-label-md text-[12px] text-outline">Destination</p>
+<p class="font-body-md text-[14px] text-on-surface">Portland, OR <span class="text-outline-variant ml-1 font-normal">(174 mi)</span></p>
+</div>
+</div>
+<div class="flex justify-between items-center pt-3 border-t border-outline-variant/20">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="person">person</span>
+</div>
+<span class="font-body-md text-[12px] text-outline">Unassigned</span>
+</div>
+<button class="text-primary hover:bg-primary-container/20 p-1 rounded-md transition-colors"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Dispatched -->
+<div class="flex-1 flex flex-col bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="p-4 border-b border-primary/20 flex justify-between items-center bg-primary/5">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary animate-pulse"></div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">Dispatched</h3>
+<span class="bg-primary/20 text-primary-fixed-variant text-xs px-2 py-0.5 rounded-full font-label-md">2</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[20px]" data-icon="more_horiz">more_horiz</span></button>
+</div>
+<div class="p-3 flex-1 overflow-y-auto kanban-col-scroll flex flex-col gap-3 bg-surface-container-low/30" id="col-dispatched" ondragover="allowDrop(event)" ondrop="drop(event)">
+<!-- Card 2 -->
+<div class="kanban-card bg-surface rounded-lg shadow-sm border border-primary/20 p-4 cursor-grab relative overflow-hidden" draggable="true" id="card-2" ondragstart="drag(event)">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<div class="flex justify-between items-start mb-3">
+<span class="bg-primary/10 text-primary font-label-md text-[11px] px-2 py-1 rounded-md tracking-wide">TRP-8488</span>
+<span class="text-primary font-label-md text-[12px] font-bold">$3,400</span>
+</div>
+<h4 class="font-headline-md text-on-surface text-[16px] mb-1">Freightliner Cascadia</h4>
+<div class="flex items-center gap-2 mb-4 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="ac_unit">ac_unit</span>
+<span class="font-body-md text-[13px]">Refrigerated • 32,000 lbs</span>
+</div>
+<div class="relative pl-6 mb-4">
+<div class="absolute left-2.5 top-2 bottom-2 w-0.5 bg-primary/30 rounded-full"></div>
+<div class="mb-3 relative">
+<div class="absolute left-[-22px] top-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-surface"></div>
+<p class="font-label-md text-[12px] text-outline">Source</p>
+<p class="font-body-md text-[14px] text-on-surface line-through text-outline-variant">Chicago, IL</p>
+</div>
+<div class="relative">
+<div class="absolute left-[-22px] top-1 w-2.5 h-2.5 rounded-full bg-outline border-2 border-surface"></div>
+<p class="font-label-md text-[12px] text-outline">Destination (ETA: 4h)</p>
+<p class="font-body-md text-[14px] text-on-surface">Detroit, MI <span class="text-outline-variant ml-1 font-normal">(283 mi)</span></p>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-surface-variant rounded-full h-1.5 mb-4">
+<div class="bg-primary h-1.5 rounded-full" style="width: 75%"></div>
+</div>
+<div class="flex justify-between items-center pt-3 border-t border-outline-variant/20">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A smiling truck driver wearing a hi-vis vest in a truck cab, natural light, realistic photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwg22-7RiLTdTXJE5P_dVyHhqTDUzt1owAEsOU9ByEVX5sw2npQ6lEyHIJApwbWNH4bY6H4mXqaMLdE9pkMpPKmwGDXn1uaLiv_wdwl6j5cvc8Oqwrzuu2_kNsx2nE0JlcR4sCC8EGMrwv8DXLKkDkwuYlJe99xKxF1vqfmJiW0U89jo3WPCmZmjKoF0yhg-EjpWDoXzfvrcQAW5cGXb05S4M9dwaTEbOwY8eBwappVFeoJPFPNMyP5A"/>
+</div>
+<span class="font-body-md text-[12px] text-on-surface">M. Johnson</span>
+</div>
+<div class="flex items-center gap-1 text-secondary font-label-md text-[11px] bg-secondary-container/30 px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[12px]" data-icon="speed">speed</span>
+                                    On Time
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Completed -->
+<div class="flex-1 flex flex-col bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="p-4 border-b border-secondary/20 flex justify-between items-center bg-secondary/5">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">Completed</h3>
+<span class="bg-secondary/20 text-secondary-fixed-dim text-xs px-2 py-0.5 rounded-full font-label-md">12</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[20px]" data-icon="more_horiz">more_horiz</span></button>
+</div>
+<div class="p-3 flex-1 overflow-y-auto kanban-col-scroll flex flex-col gap-3 bg-surface-container-low/30" id="col-completed" ondragover="allowDrop(event)" ondrop="drop(event)">
+<!-- Card 3 -->
+<div class="kanban-card bg-surface rounded-lg shadow-sm border border-outline-variant/30 p-4 cursor-grab opacity-80" draggable="true" id="card-3" ondragstart="drag(event)">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-surface-variant text-on-surface-variant font-label-md text-[11px] px-2 py-1 rounded-md tracking-wide line-through">TRP-8455</span>
+<span class="text-on-surface-variant font-label-md text-[12px] font-bold">$890</span>
+</div>
+<h4 class="font-headline-md text-on-surface text-[16px] mb-1">Kenworth T680</h4>
+<div class="flex items-center gap-2 mb-4 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="local_shipping">local_shipping</span>
+<span class="font-body-md text-[13px]">Dry Van • 8,500 lbs</span>
+</div>
+<div class="flex justify-between items-center pt-3 border-t border-outline-variant/20">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant grayscale">
+<img class="w-full h-full object-cover" data-alt="Female delivery driver portrait, neutral expression, outdoor daylight setting, realistic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjtI8HaeWYDWfyRJn9j1lkUCxlqUYAPNn3xCYFpwWTL8MY7Cm7hsTW95f-5o9yncDfMxnRDUj6aoF520p3UJGbqgbm8qp0JGEZbf1KoAyQYFk18Iie6VB7bO1FNjZjcU86pulwdJwl1K8TXX5tkeiD95cv5g1Hxasy2xAmg5cuGwz02u_r8Ozqrs1AtbddKgFnpHqnyEsCc4XS0ivLRGcXJrh5iN4UhrOEBwCThfNEY_mdDQGYWNfEtQ"/>
+</div>
+<span class="font-body-md text-[12px] text-on-surface-variant">S. Davis</span>
+</div>
+<div class="text-secondary font-label-md text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                                    Delivered
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Cancelled -->
+<div class="flex-1 flex flex-col bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="p-4 border-b border-error/20 flex justify-between items-center bg-error/5">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-error"></div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">Cancelled</h3>
+<span class="bg-error/20 text-error text-xs px-2 py-0.5 rounded-full font-label-md">1</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[20px]" data-icon="more_horiz">more_horiz</span></button>
+</div>
+<div class="p-3 flex-1 overflow-y-auto kanban-col-scroll flex flex-col gap-3 bg-surface-container-low/30" id="col-cancelled" ondragover="allowDrop(event)" ondrop="drop(event)">
+<!-- Card empty state example -->
+<div class="h-24 border-2 border-dashed border-outline-variant/30 rounded-lg flex items-center justify-center text-outline-variant font-body-md text-[13px]">
+                            Drop here to cancel
+                        </div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Basic Drag and Drop Logic -->
+<script>
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+            ev.target.classList.add('dragging');
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var targetCol = ev.target.closest('[id^="col-"]');
+            var element = document.getElementById(data);
+            if(targetCol && element) {
+                targetCol.appendChild(element);
+            }
+            if(element) element.classList.remove('dragging');
+        }
+        
+        document.addEventListener('dragend', function(ev) {
+            if(ev.target.classList.contains('dragging')) {
+                ev.target.classList.remove('dragging');
+            }
+        });
+    </script>
+</body></html>
