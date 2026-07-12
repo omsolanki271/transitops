@@ -2,55 +2,60 @@ import React, { useState, useEffect } from 'react';
 import { getTrips } from '../../../api/trips';
 import { getVehicles } from '../../../api/vehicles';
 import { getExpenses, getFuelLogs } from '../../../api/expenses';
-import { 
-  getReportsExportUrl, 
-  getSafetyReportData, 
-  downloadSafetyCSV, 
-  downloadSafetyPDF 
+import {
+  getReportsExportUrl,
+  getSafetyReportData,
+  downloadSafetyCSV,
+  downloadSafetyPDF
 } from '../../../api/reports';
 import { isMockMode } from '../../../api/client';
-import { 
-  Download, 
-  BarChart2, 
-  TrendingUp, 
-  ShieldAlert, 
-  Award, 
-  Compass, 
-  Users, 
-  Calendar, 
-  CheckCircle2, 
+import {
+  Download,
+  BarChart2,
+  TrendingUp,
+  ShieldAlert,
+  Award,
+  Compass,
+  Users,
+  Calendar,
+  CheckCircle2,
   XCircle,
   AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { canPerformAction } from '../../../rbac/permissions';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer, 
-  LineChart, 
-  Line 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
+  Line
 } from 'recharts';
+
 
 export const Reports = () => {
   const { user } = useAuth();
   const isSafetyOfficer = user?.role === 'safety_officer';
   const canExportReports = canPerformAction(user?.role, 'reports', 'exportCsv');
 
+
   // Original Financial dashboard states
   const [completedTrips, setCompletedTrips] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [roiReport, setRoiReport] = useState([]);
 
+
   // Safety Officer dashboard states
   const [safetyData, setSafetyData] = useState(null);
 
+
   const [loading, setLoading] = useState(true);
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -68,8 +73,10 @@ export const Reports = () => {
           getExpenses()
         ]);
 
+
         const completed = tripsRes.data.filter(t => t.status === 'completed');
         setCompletedTrips(completed);
+
 
         const getVehicleId = (item) => {
           if (!item) return null;
@@ -80,16 +87,18 @@ export const Reports = () => {
           return null;
         };
 
+
         const calculatedRoi = vehiclesRes.data.map(v => {
           const vFuel = fuelRes.data.filter(f => getVehicleId(f) === v.id).reduce((sum, f) => sum + parseFloat(f.cost || 0), 0);
           const vExpenses = expensesRes.data.filter(e => getVehicleId(e) === v.id).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
           const vRevenue = tripsRes.data.filter(t => getVehicleId(t) === v.id && t.status === 'completed').reduce((sum, t) => sum + parseFloat(t.revenue || 0), 0);
-          
+
           const acquisitionCost = parseFloat(v.acquisition_cost) || 0;
           const returnVal = vRevenue - (vFuel + vExpenses);
-          const roi = acquisitionCost > 0 
-            ? parseFloat(((returnVal / acquisitionCost) * 100).toFixed(2)) 
+          const roi = acquisitionCost > 0
+            ? parseFloat(((returnVal / acquisitionCost) * 100).toFixed(2))
             : 0;
+
 
           return {
             id: v.id,
@@ -111,14 +120,17 @@ export const Reports = () => {
     }
   };
 
+
   useEffect(() => {
     fetchData();
   }, [user]);
+
 
   const handleExportCSV = (reportType) => {
     if (isMockMode()) {
       let csvContent = '';
       let filename = `${reportType}_report.csv`;
+
 
       if (reportType === 'fuel_efficiency') {
         csvContent = 'Trip ID,Vehicle,Route,Distance (km),Fuel (Liters),Efficiency (km/L)\n';
@@ -136,6 +148,7 @@ export const Reports = () => {
         csvContent = 'Report Type,Export Date,Status\nMock Export,2026-07-12,Success\n';
       }
 
+
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -148,6 +161,7 @@ export const Reports = () => {
     }
   };
 
+
   const handleSafetyCSVExport = async () => {
     try {
       await downloadSafetyCSV();
@@ -155,6 +169,7 @@ export const Reports = () => {
       console.error(err);
     }
   };
+
 
   const handleSafetyPDFExport = async () => {
     try {
@@ -164,9 +179,11 @@ export const Reports = () => {
     }
   };
 
+
   const formatCurrency = (val) => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
   };
+
 
   const formatDate = (dateStr) => {
     if (!dateStr) return 'Ongoing';
@@ -176,6 +193,7 @@ export const Reports = () => {
       year: 'numeric'
     });
   };
+
 
   // Render Safety Officer Dashboard
   if (isSafetyOfficer) {
@@ -187,6 +205,7 @@ export const Reports = () => {
       average_safety_score: 0
     };
 
+
     const safetyScoreData = (safetyData?.drivers_safety_scores || []).map(d => ({
       ...d,
       displayName: d.name.length > 12 ? d.name.slice(0, 10) + '..' : d.name
@@ -195,10 +214,12 @@ export const Reports = () => {
     const suspendedDriversData = safetyData?.suspended_drivers || [];
     const safetyTrendData = safetyData?.safety_trend || [];
 
+
     // Calculate compliance percent
     const compliancePercent = stats.total_drivers > 0
       ? Math.round((stats.compliant_drivers / stats.total_drivers) * 100)
       : 100;
+
 
     return (
       <div className="space-y-6 select-none">
@@ -230,6 +251,7 @@ export const Reports = () => {
           )}
         </div>
 
+
         {loading ? (
           <div className="text-center py-16 text-sm font-semibold text-on-surface-variant">
             Compiling driver safety audit...
@@ -238,7 +260,7 @@ export const Reports = () => {
           <div className="space-y-6">
             {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="bg-white p-4.5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+              <div className="bg-white p-6 rounded-xl border border-gray-150 shadow-sm space-y-2">
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Compliance Level</span>
                 <div className="flex items-baseline justify-between">
                   <span className={`text-2xl font-black ${compliancePercent >= 85 ? 'text-green-600' : 'text-amber-500'}`}>{compliancePercent}%</span>
@@ -247,7 +269,8 @@ export const Reports = () => {
                 <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Compliance threshold target is 90%</p>
               </div>
 
-              <div className="bg-white p-4.5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+
+              <div className="bg-white p-6 rounded-xl border border-gray-150 shadow-sm space-y-2">
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Average Safety Score</span>
                 <div className="flex items-baseline justify-between">
                   <span className="text-2xl font-black text-on-surface">{stats.average_safety_score}/100</span>
@@ -256,7 +279,8 @@ export const Reports = () => {
                 <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Fleet-wide driving score average</p>
               </div>
 
-              <div className="bg-white p-4.5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+
+              <div className="bg-white p-6 rounded-xl border border-gray-150 shadow-sm space-y-2">
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Total Drivers</span>
                 <div className="flex items-baseline justify-between">
                   <span className="text-2xl font-black text-on-surface">{stats.total_drivers}</span>
@@ -265,7 +289,8 @@ export const Reports = () => {
                 <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Active driver profile registers</p>
               </div>
 
-              <div className="bg-white p-4.5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+
+              <div className="bg-white p-6 rounded-xl border border-gray-150 shadow-sm space-y-2">
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Suspended Drivers</span>
                 <div className="flex items-baseline justify-between">
                   <span className={`text-2xl font-black ${stats.suspended_drivers > 0 ? 'text-error font-bold' : 'text-on-surface'}`}>{stats.suspended_drivers}</span>
@@ -274,7 +299,8 @@ export const Reports = () => {
                 <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Suspended for safety audits</p>
               </div>
 
-              <div className="bg-white p-4.5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+
+              <div className="bg-white p-6 rounded-xl border border-gray-150 shadow-sm space-y-2">
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Expired Licenses</span>
                 <div className="flex items-baseline justify-between">
                   <span className={`text-2xl font-black ${stats.expired_licenses > 0 ? 'text-error font-bold' : 'text-on-surface'}`}>{stats.expired_licenses}</span>
@@ -283,6 +309,7 @@ export const Reports = () => {
                 <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Licenses needing urgent renewal</p>
               </div>
             </div>
+
 
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -305,6 +332,7 @@ export const Reports = () => {
                 </div>
               </div>
 
+
               {/* Safety Trend Line Chart */}
               <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4">
                 <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider flex items-center gap-1.5">
@@ -325,6 +353,7 @@ export const Reports = () => {
               </div>
             </div>
 
+
             {/* Lists/Tables Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Compliance / Driver License Expiry table */}
@@ -333,7 +362,7 @@ export const Reports = () => {
                   <Calendar className="h-4.5 w-4.5 text-primary" />
                   <span>License Expiry & Compliance Report</span>
                 </h3>
-                
+
                 <div className="overflow-x-auto max-h-[300px] overflow-y-auto border border-gray-100 rounded-lg">
                   <table className="min-w-full divide-y divide-gray-100 text-left text-xs font-semibold text-on-surface">
                     <thead className="bg-gray-50 text-[10px] uppercase font-bold text-on-surface-variant sticky top-0">
@@ -366,11 +395,10 @@ export const Reports = () => {
                               )}
                             </td>
                             <td className="px-4 py-3 text-right capitalize">
-                              <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                l.status === 'available' ? 'bg-green-100 text-green-800' :
+                              <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${l.status === 'available' ? 'bg-green-100 text-green-800' :
                                 l.status === 'on_trip' ? 'bg-blue-100 text-blue-800' :
-                                l.status === 'suspended' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                              }`}>
+                                  l.status === 'suspended' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                                }`}>
                                 {l.status.replace('_', ' ')}
                               </span>
                             </td>
@@ -382,12 +410,14 @@ export const Reports = () => {
                 </div>
               </div>
 
+
               {/* Suspended Drivers Panel */}
               <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4 select-none">
                 <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider flex items-center gap-1.5">
                   <ShieldAlert className="h-4.5 w-4.5 text-error" />
                   <span>Suspended Drivers</span>
                 </h3>
+
 
                 <div className="overflow-y-auto max-h-[300px] space-y-3 pr-1">
                   {suspendedDriversData.length === 0 ? (
@@ -417,11 +447,13 @@ export const Reports = () => {
     );
   }
 
+
   // Original Financial Dashboard (Fleet Manager / Financial Analyst)
   const chartEfficiencyData = completedTrips.map(t => ({
     name: `Trip #${t.id}`,
     efficiency: t.fuel_consumed > 0 ? parseFloat((t.actual_distance / t.fuel_consumed).toFixed(2)) : 0
   }));
+
 
   return (
     <div className="space-y-6 select-none">
@@ -431,10 +463,12 @@ export const Reports = () => {
         <p className="text-xs text-on-surface-variant font-medium mt-1.5 font-sans">View efficiency metrics, ROI calculations, and export csv datasets</p>
       </div>
 
+
       {loading ? (
         <div className="text-center py-16 text-sm font-semibold text-on-surface-variant">Generating analytics dashboard...</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
 
           {/* FUEL EFFICIENCY REPORT */}
           <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4">
@@ -454,6 +488,7 @@ export const Reports = () => {
               )}
             </div>
 
+
             {/* Efficiency Chart */}
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
@@ -466,6 +501,7 @@ export const Reports = () => {
                 </LineChart>
               </ResponsiveContainer>
             </div>
+
 
             {/* Completed trips table */}
             <div className="overflow-x-auto max-h-[220px] overflow-y-auto border border-gray-100 rounded-lg">
@@ -497,6 +533,7 @@ export const Reports = () => {
             </div>
           </div>
 
+
           {/* VEHICLE ROI ANALYTICS */}
           <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4">
             <div className="flex justify-between items-center">
@@ -515,6 +552,7 @@ export const Reports = () => {
               )}
             </div>
 
+
             {/* ROI Chart */}
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
@@ -527,6 +565,7 @@ export const Reports = () => {
                 </BarChart>
               </ResponsiveContainer>
             </div>
+
 
             {/* ROI Details Table */}
             <div className="overflow-x-auto max-h-[220px] overflow-y-auto border border-gray-100 rounded-lg">
@@ -560,13 +599,14 @@ export const Reports = () => {
             </div>
           </div>
 
+
           {/* COMPLIANCE & SAFETY INSIGHTS */}
           <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4 lg:col-span-2 select-none">
             <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider flex items-center gap-1.5">
               <Award className="h-4.5 w-4.5 text-primary" />
               <span>Fleet Health & Compliance Audit</span>
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Compliance card */}
               <div className="border border-gray-150 rounded-xl p-4 space-y-2">
@@ -582,6 +622,7 @@ export const Reports = () => {
                 </p>
               </div>
 
+
               {/* Maintenance Schedule */}
               <div className="border border-gray-150 rounded-xl p-4 space-y-2">
                 <h4 className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Active Operations</h4>
@@ -595,6 +636,7 @@ export const Reports = () => {
                   Trip completion audits capture fuel efficiency indices and update odometer logs automatically.
                 </p>
               </div>
+
 
               {/* Safety audits */}
               <div className="border border-gray-150 rounded-xl p-4 space-y-2">
@@ -611,10 +653,15 @@ export const Reports = () => {
             </div>
           </div>
 
+
         </div>
       )}
     </div>
   );
 };
 
+
 export default Reports;
+
+
+
