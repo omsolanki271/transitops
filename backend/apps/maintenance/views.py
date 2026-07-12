@@ -1,28 +1,82 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
-from core.exceptions import StateTransitionConflict
+from rest_framework.pagination import PageNumberPagination
+from django.db import models
+from core.exceptions import StateTransitionConflict, BusinessRuleValidationError
 
 from core.response import standard_response
 from .models import MaintenanceLog
 from .serializers import MaintenanceLogSerializer
 from core.permissions import CanAccessMaintenance
-from .services import create_maintenance_log, close_maintenance_log
+from .services import create_maintenance_log, update_maintenance_log, close_maintenance_log
+
+class MaintenancePagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def get_paginated_response(self, data):
+        return Response({
+            'success': True,
+            'data': data,
+            'meta': {
+                'page': self.page.number,
+                'page_size': self.page.paginator.per_page,
+                'total': self.page.paginator.count
+            }
+        })
+
+from rest_framework.response import Response
 
 class MaintenanceLogViewSet(viewsets.ModelViewSet):
     """
     ViewSet for handling Maintenance Log CRUD and state transition (close) operations.
     Enforces business logic at the service layer.
     """
-    queryset = MaintenanceLog.objects.all()
     serializer_class = MaintenanceLogSerializer
     permission_classes = [CanAccessMaintenance]
-    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
-    filterset_fields = ('status', 'vehicle')
-    search_fields = ('maintenance_type', 'description', 'vehicle__registration_number')
-    ordering_fields = ('started_at', 'cost', 'created_at')
-    ordering = ('-created_at',)
+    pagination_class = MaintenancePagination
+
+    def get_queryset(self):
+        queryset = MaintenanceLog.objects.all()
+        
+        # Status Filter
+        status_param = self.request.query_params.get('status')
+        if status_param and status_param != 'all':
+            queryset = queryset.filter(status=status_param)
+            
+        # Search Filter
+        search_param = self.request.query_params.get('search')
+        if search_param:
+            queryset = queryset.filter(
+                models.Q(vehicle__name_model__icontains=search_param) |
+                models.Q(vehicle__registration_number__icontains=search_param) |
+                models.Q(service_type__icontains=search_param) |
+                models.Q(maintenance_type__icontains=search_param) |
+                models.Q(description__icontains=search_param) |
+                models.Q(workshop__icontains=search_param) |
+                models.Q(mechanic__icontains=search_param)
+            )
+
+        # Sorting
+        sort_param = self.request.query_params.get('ordering') or self.request.query_params.get('sort')
+        if sort_param:
+            if sort_param == 'newest':
+                queryset = queryset.order_by('-created_at')
+            elif sort_param == 'oldest':
+                queryset = queryset.order_by('created_at')
+            elif sort_param == 'highest_cost':
+                queryset = queryset.order_by('-cost')
+            elif sort_param == 'lowest_cost':
+                queryset = queryset.order_by('cost')
+            elif sort_param == 'vehicle_name':
+                queryset = queryset.order_by('vehicle__name_model')
+            else:
+                queryset = queryset.order_by(sort_param)
+        else:
+            queryset = queryset.order_by('-created_at')
+            
+        return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -41,35 +95,65 @@ class MaintenanceLogViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        log = create_maintenance_log(serializer.validated_data, request.user)
-        return standard_response(success=True, data=self.get_serializer(log).data, status_code=status.HTTP_201_CREATED)
+        try:
+            log = create_maintenance_log(serializer.validated_data, request.user)
+            return standard_response(success=True, data=self.get_serializer(log).data, status_code=status.HTTP_201_CREATED)
+        except (BusinessRuleValidationError, StateTransitionConflict) as e:
+            return standard_response(
+                success=False,
+                error={
+                    "code": getattr(e, "code", "VALIDATION_ERROR"),
+                    "message": str(e),
+                    "fields": getattr(e, "fields", {})
+                },
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        if instance.status == 'closed':
-            raise StateTransitionConflict("Cannot edit a closed maintenance log.")
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        log = serializer.save()
-        return standard_response(success=True, data=self.get_serializer(log).data, status_code=status.HTTP_200_OK)
+        try:
+            log = update_maintenance_log(instance.id, serializer.validated_data, request.user)
+            return standard_response(success=True, data=self.get_serializer(log).data, status_code=status.HTTP_200_OK)
+        except (BusinessRuleValidationError, StateTransitionConflict) as e:
+            return standard_response(
+                success=False,
+                error={
+                    "code": getattr(e, "code", "VALIDATION_ERROR"),
+                    "message": str(e),
+                    "fields": getattr(e, "fields", {})
+                },
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        # If active, restore vehicle status
         if instance.status == 'active':
             vehicle = instance.vehicle
             if vehicle.status == 'in_shop':
-                vehicle.status = 'available'
+                vehicle.status = 'available' if vehicle.status != 'retired' else 'retired'
                 vehicle.save()
         instance.delete()
         return standard_response(success=True, data={"message": "Maintenance log deleted successfully."}, status_code=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post'], url_path='close')
+    @action(detail=True, methods=['post', 'patch'], url_path='close')
     def close(self, request, pk=None):
         """
-        POST /api/v1/maintenance-logs/{id}/close/
+        POST/PATCH /api/v1/maintenance/{id}/close/
         Closes the maintenance log and restores vehicle status to available.
         """
-        log = close_maintenance_log(pk)
-        return standard_response(success=True, data=self.get_serializer(log).data, status_code=status.HTTP_200_OK)
+        try:
+            log = close_maintenance_log(pk, request.user)
+            return standard_response(success=True, data=self.get_serializer(log).data, status_code=status.HTTP_200_OK)
+        except (BusinessRuleValidationError, StateTransitionConflict) as e:
+            return standard_response(
+                success=False,
+                error={
+                    "code": getattr(e, "code", "VALIDATION_ERROR"),
+                    "message": str(e),
+                    "fields": getattr(e, "fields", {})
+                },
+                status_code=status.HTTP_400_BAD_REQUEST
+            )

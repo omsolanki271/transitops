@@ -98,6 +98,8 @@ export const ACTION_PERMISSIONS = {
   },
   maintenance: {
     create: [ROLES.FLEET_MANAGER],
+    update: [ROLES.FLEET_MANAGER],
+    delete: [ROLES.FLEET_MANAGER],
     close: [ROLES.FLEET_MANAGER]
   },
   fuel_expenses: {

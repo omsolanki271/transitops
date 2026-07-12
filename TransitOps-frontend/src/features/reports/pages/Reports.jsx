@@ -6,7 +6,10 @@ import {
   getReportsExportUrl,
   getSafetyReportData,
   downloadSafetyCSV,
-  downloadSafetyPDF
+  downloadSafetyPDF,
+  getMaintenanceReportData,
+  downloadMaintenanceCSV,
+  downloadMaintenancePDF
 } from '../../../api/reports';
 import { isMockMode } from '../../../api/client';
 import {
@@ -20,7 +23,10 @@ import {
   Calendar,
   CheckCircle2,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
+  Wrench,
+  Clock,
+  DollarSign
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { canPerformAction } from '../../../rbac/permissions';
@@ -53,6 +59,10 @@ export const Reports = () => {
   // Safety Officer dashboard states
   const [safetyData, setSafetyData] = useState(null);
 
+  // Maintenance dashboard states (Fleet Manager)
+  const [maintData, setMaintData] = useState(null);
+  const [activeTab, setActiveTab] = useState('operational'); // 'operational' or 'maintenance'
+
 
   const [loading, setLoading] = useState(true);
 
@@ -66,13 +76,19 @@ export const Reports = () => {
         setSafetyData(res.data);
       } else {
         // Fetch original financial reports data
-        const [tripsRes, vehiclesRes, fuelRes, expensesRes] = await Promise.all([
+        const promises = [
           getTrips(),
           getVehicles(),
           getFuelLogs(),
           getExpenses()
-        ]);
+        ];
+        
+        if (user?.role === 'fleet_manager') {
+          promises.push(getMaintenanceReportData());
+        }
 
+        const results = await Promise.all(promises);
+        const [tripsRes, vehiclesRes, fuelRes, expensesRes, maintRes] = results;
 
         const completed = tripsRes.data.filter(t => t.status === 'completed');
         setCompletedTrips(completed);
@@ -112,6 +128,10 @@ export const Reports = () => {
         });
         setRoiReport(calculatedRoi);
         setVehicles(vehiclesRes.data);
+
+        if (maintRes) {
+          setMaintData(maintRes.data);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -174,6 +194,22 @@ export const Reports = () => {
   const handleSafetyPDFExport = async () => {
     try {
       await downloadSafetyPDF();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleMaintenanceCSVExport = async () => {
+    try {
+      await downloadMaintenanceCSV();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleMaintenancePDFExport = async () => {
+    try {
+      await downloadMaintenancePDF();
     } catch (err) {
       console.error(err);
     }
@@ -454,18 +490,187 @@ export const Reports = () => {
     efficiency: t.fuel_consumed > 0 ? parseFloat((t.actual_distance / t.fuel_consumed).toFixed(2)) : 0
   }));
 
+  const renderMaintenanceDashboard = () => {
+    const stats = maintData || {
+      total_maintenance_cost: 0,
+      active_jobs: 0,
+      completed_jobs: 0,
+      cancelled_jobs: 0,
+      average_cost: 0,
+      vehicles_in_shop: 0,
+      monthly_maintenance_cost: [],
+      service_type_distribution: [],
+      maintenance_trend: []
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* Export Buttons */}
+        <div className="flex justify-end gap-2.5">
+          <button
+            onClick={handleMaintenanceCSVExport}
+            className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-sm font-semibold rounded-xl text-on-surface shadow-sm cursor-pointer transition-all transform hover:-translate-y-0.5"
+          >
+            <Download className="h-4.5 w-4.5 text-primary" />
+            <span>Export CSV</span>
+          </button>
+          <button
+            onClick={handleMaintenancePDFExport}
+            className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg cursor-pointer transition-all transform hover:-translate-y-0.5"
+          >
+            <Download className="h-4.5 w-4.5" />
+            <span>Export PDF</span>
+          </button>
+        </div>
+
+        {/* KPI Cards Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="bg-white p-5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Total Service Cost</span>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xl font-black text-on-surface">{formatCurrency(stats.total_maintenance_cost)}</span>
+              <Wrench className="h-5 w-5 text-primary" />
+            </div>
+            <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Cumulative cost of all active/completed jobs</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Average Job Cost</span>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xl font-black text-on-surface">{formatCurrency(stats.average_cost)}</span>
+              <DollarSign className="h-5 w-5 text-green-600" />
+            </div>
+            <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Average cost per repair workshop job</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Active Repair Jobs</span>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xl font-black text-amber-600">{stats.active_jobs}</span>
+              <Clock className="h-5 w-5 text-amber-500" />
+            </div>
+            <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Vehicles currently undergoing service</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Completed Jobs</span>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xl font-black text-green-600">{stats.completed_jobs}</span>
+              <CheckCircle2 className="h-5 w-5 text-green-500" />
+            </div>
+            <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Successfully completed repairs</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border border-gray-150 shadow-sm space-y-2">
+            <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Vehicles in Shop</span>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xl font-black text-red-600">{stats.vehicles_in_shop}</span>
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+            </div>
+            <p className="text-[10.5px] leading-tight text-on-surface-variant font-medium">Fleet capacity currently off duty in-shop</p>
+          </div>
+        </div>
+
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Monthly Cost Chart */}
+          <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4 lg:col-span-2">
+            <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+              <TrendingUp className="h-4.5 w-4.5 text-primary" />
+              <span>Monthly Maintenance Cost Trend</span>
+            </h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={stats.monthly_maintenance_cost}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="month" stroke="#6B7280" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#6B7280" fontSize={11} tickLine={false} />
+                  <Tooltip formatter={(value) => formatCurrency(value)} />
+                  <Line type="monotone" dataKey="cost" stroke="#4F46E5" strokeWidth={2.5} name="Total Cost" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Service Type Distribution */}
+          <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4">
+            <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+              <BarChart2 className="h-4.5 w-4.5 text-primary" />
+              <span>Service Type Distribution</span>
+            </h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.service_type_distribution} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
+                  <XAxis type="number" stroke="#6B7280" fontSize={11} tickLine={false} />
+                  <YAxis dataKey="name" type="category" stroke="#6B7280" fontSize={10} tickLine={false} width={80} />
+                  <Tooltip formatter={(value) => formatCurrency(value)} />
+                  <Bar dataKey="value" fill="#006b5f" radius={[0, 4, 4, 0]} name="Total Spend" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Maintenance Trend counts */}
+          <div className="bg-white rounded-xl border border-gray-150 p-5 shadow-sm space-y-4 lg:col-span-3">
+            <h3 className="font-bold text-sm text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+              <TrendingUp className="h-4.5 w-4.5 text-primary" />
+              <span>Completed Service Trend</span>
+            </h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.maintenance_trend}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="month" stroke="#6B7280" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#6B7280" fontSize={11} tickLine={false} />
+                  <Tooltip />
+                  <Bar dataKey="jobs" fill="#4F46E5" radius={[4, 4, 0, 0]} name="Completed Repair Jobs" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6 select-none">
       {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-on-surface m-0 leading-none">Reports & Analytics</h2>
-        <p className="text-xs text-on-surface-variant font-medium mt-1.5 font-sans">View efficiency metrics, ROI calculations, and export csv datasets</p>
+        <p className="text-xs text-on-surface-variant font-medium mt-1.5 font-sans">View efficiency metrics, ROI calculations, and export report datasets</p>
       </div>
 
+      {user?.role === 'fleet_manager' && (
+        <div className="flex border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('operational')}
+            className={`px-4 py-2 font-bold text-sm cursor-pointer border-b-2 transition-all ${
+              activeTab === 'operational'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            Operational & ROI Reports
+          </button>
+          <button
+            onClick={() => setActiveTab('maintenance')}
+            className={`px-4 py-2 font-bold text-sm cursor-pointer border-b-2 transition-all ${
+              activeTab === 'maintenance'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            Maintenance & Repair Reports
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center py-16 text-sm font-semibold text-on-surface-variant">Generating analytics dashboard...</div>
+      ) : activeTab === 'maintenance' && user?.role === 'fleet_manager' ? (
+        renderMaintenanceDashboard()
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 

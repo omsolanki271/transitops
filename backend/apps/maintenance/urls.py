@@ -4,6 +4,7 @@ from .views import MaintenanceLogViewSet
 
 router = DefaultRouter()
 router.register(r'maintenance-logs', MaintenanceLogViewSet, basename='maintenance-log')
+router.register(r'maintenance', MaintenanceLogViewSet, basename='maintenance')
 
 urlpatterns = [
     path('', include(router.urls)),

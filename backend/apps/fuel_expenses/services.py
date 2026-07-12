@@ -7,11 +7,18 @@ import decimal
 
 def create_fuel_log(data, user):
     """
-    Business service to create a fuel log. Enforces positive inputs.
+    Business service to create a fuel log. Enforces positive inputs and vehicle availability.
     """
+    vehicle = data.get('vehicle')
     liters = data.get('liters')
     cost = data.get('cost')
     
+    if vehicle:
+        if vehicle.status == 'in_shop':
+            raise BusinessRuleValidationError("Vehicle is currently in shop for maintenance.", fields={"vehicle": ["Vehicle is in shop."]})
+        elif vehicle.status == 'retired':
+            raise BusinessRuleValidationError("Vehicle is retired.", fields={"vehicle": ["Vehicle is retired."]})
+
     if liters <= 0:
         raise BusinessRuleValidationError("Liters must be positive.", fields={"liters": ["Must be greater than 0."]})
     if cost <= 0:
@@ -22,10 +29,17 @@ def create_fuel_log(data, user):
 
 def create_expense(data, user):
     """
-    Business service to create an expense. Enforces positive inputs.
+    Business service to create an expense. Enforces positive inputs and vehicle availability.
     """
+    vehicle = data.get('vehicle')
     amount = data.get('amount')
     
+    if vehicle:
+        if vehicle.status == 'in_shop':
+            raise BusinessRuleValidationError("Vehicle is currently in shop for maintenance.", fields={"vehicle": ["Vehicle is in shop."]})
+        elif vehicle.status == 'retired':
+            raise BusinessRuleValidationError("Vehicle is retired.", fields={"vehicle": ["Vehicle is retired."]})
+
     if amount <= 0:
         raise BusinessRuleValidationError("Amount must be positive.", fields={"amount": ["Must be greater than 0."]})
         

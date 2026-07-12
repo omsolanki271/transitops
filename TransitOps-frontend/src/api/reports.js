@@ -155,3 +155,94 @@ const downloadBlobFile = async (url, filename) => {
     alert('Failed to download report.');
   }
 };
+
+export const getMaintenanceReportData = async () => {
+  if (isMockMode()) {
+    const logs = mockDb.getMaintenanceLogs();
+    const totalCost = logs.filter(l => l.status !== 'cancelled').reduce((sum, l) => sum + parseFloat(l.cost || 0), 0);
+    const active = logs.filter(l => l.status === 'active').length;
+    const completed = logs.filter(l => l.status === 'completed' || l.status === 'closed').length;
+    const cancelled = logs.filter(l => l.status === 'cancelled').length;
+    const avgCost = logs.length > 0 ? totalCost / logs.length : 0;
+    const inShop = mockDb.getVehicles().filter(v => v.status === 'in_shop').length;
+
+    return {
+      success: true,
+      data: {
+        total_maintenance_cost: totalCost,
+        active_jobs: active,
+        completed_jobs: completed,
+        cancelled_jobs: cancelled,
+        average_cost: avgCost,
+        vehicles_in_shop: inShop,
+        monthly_maintenance_cost: [
+          { month: 'Jan', cost: 12000 },
+          { month: 'Feb', cost: 15000 },
+          { month: 'Mar', cost: 8000 },
+          { month: 'Apr', cost: 22000 },
+          { month: 'May', cost: 30000 },
+          { month: 'Jun', cost: totalCost }
+        ],
+        service_type_distribution: [
+          { name: 'Engine Overhaul', value: 45000 },
+          { name: 'Brake Replacement', value: 12500 }
+        ],
+        maintenance_trend: [
+          { month: 'Jan', jobs: 2 },
+          { month: 'Feb', jobs: 3 },
+          { month: 'Mar', jobs: 1 },
+          { month: 'Apr', jobs: 4 },
+          { month: 'May', jobs: 5 },
+          { month: 'Jun', jobs: logs.length }
+        ]
+      }
+    };
+  }
+  return apiClient.get('/reports/maintenance/');
+};
+
+export const downloadMaintenanceCSV = async () => {
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const filename = `Maintenance_Report_${dateStr}.csv`;
+
+  if (isMockMode()) {
+    const logs = mockDb.getMaintenanceLogs();
+    const vehicles = mockDb.getVehicles();
+    let csvContent = 'Vehicle,Registration Number,Service Type,Description,Workshop,Mechanic,Priority,Cost,Status,Start Date,End Date,Created By\n';
+    logs.forEach(l => {
+      const v = vehicles.find(veh => veh.id === l.vehicle_id) || {};
+      csvContent += `"${v.name_model || ''}","${v.registration_number || ''}","${l.maintenance_type}","${l.description}","${l.workshop || ''}","${l.mechanic || ''}","${l.priority || 'medium'}",${l.cost},"${l.status}","${l.start_date || l.started_at || ''}","${l.end_date || l.closed_at || ''}","system"\n`;
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    return;
+  }
+  await downloadBlobFile('/reports/export/maintenance/csv/', filename);
+};
+
+export const downloadMaintenancePDF = async () => {
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const filename = `Maintenance_Report_${dateStr}.pdf`;
+
+  if (isMockMode()) {
+    const logs = mockDb.getMaintenanceLogs();
+    let txt = `%PDF-1.4\n% MOCK PDF EXPORT FOR TRANSITOPS\nMaintenance Report\nGenerated Date: ${new Date().toLocaleDateString()}\n\n`;
+    logs.forEach(l => {
+      txt += `Log #${l.id} | Service: ${l.maintenance_type} | Cost: ${l.cost} | Status: ${l.status}\n`;
+    });
+    const blob = new Blob([txt], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    return;
+  }
+  await downloadBlobFile('/reports/export/maintenance/pdf/', filename);
+};
