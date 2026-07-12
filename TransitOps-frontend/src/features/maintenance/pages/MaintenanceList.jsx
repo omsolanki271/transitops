@@ -58,7 +58,7 @@ export const MaintenanceList = () => {
     setGeneralError('');
 
     const errors = {};
-    if (!vehicleId) errors.vehicle_id = ['Vehicle selection is required'];
+    if (!vehicleId) errors.vehicle = ['Vehicle selection is required'];
     if (!maintType) errors.maintenance_type = ['Maintenance type is required'];
     if (!description) errors.description = ['Description is required'];
     if (!cost || parseFloat(cost) <= 0) errors.cost = ['Cost must be a positive number'];
@@ -69,7 +69,7 @@ export const MaintenanceList = () => {
     }
 
     const payload = {
-      vehicle_id: parseInt(vehicleId),
+      vehicle: parseInt(vehicleId),
       maintenance_type: maintType,
       description: description,
       cost: parseFloat(cost)
@@ -80,7 +80,11 @@ export const MaintenanceList = () => {
       setShowModal(false);
       fetchData();
     } catch (err) {
-      setGeneralError(err.error?.message || 'Failed to schedule maintenance.');
+      if (err.error?.fields) {
+        setFormErrors(err.error.fields);
+      } else {
+        setGeneralError(err.error?.message || 'Failed to schedule maintenance.');
+      }
     }
   };
 
@@ -98,10 +102,11 @@ export const MaintenanceList = () => {
   // Client-side search filtering
   const filteredLogs = logs.filter(log => {
     const q = search.toLowerCase();
+    const vehicle = log.vehicle_detail || log.vehicle;
     const matchesSearch = 
       log.maintenance_type.toLowerCase().includes(q) ||
-      log.vehicle_detail?.registration_number.toLowerCase().includes(q) ||
-      log.vehicle_detail?.name_model.toLowerCase().includes(q);
+      vehicle?.registration_number.toLowerCase().includes(q) ||
+      vehicle?.name_model.toLowerCase().includes(q);
     return matchesSearch;
   });
 
@@ -190,14 +195,14 @@ export const MaintenanceList = () => {
                 {filteredLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-gray-50/50 transition-colors duration-150">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {log.vehicle_detail ? (
-                        <div>
-                          <div className="font-bold">{log.vehicle_detail.name_model}</div>
-                          <div className="text-xs font-mono text-primary font-bold mt-0.5">{log.vehicle_detail.registration_number}</div>
-                        </div>
-                      ) : (
-                        'Unknown Vehicle'
-                      )}
+                    {(log.vehicle_detail || log.vehicle) ? (
+                      <div>
+                        <div className="font-bold">{(log.vehicle_detail || log.vehicle).name_model}</div>
+                        <div className="text-xs font-mono text-primary font-bold mt-0.5">{(log.vehicle_detail || log.vehicle).registration_number}</div>
+                      </div>
+                    ) : (
+                      'Unknown Vehicle'
+                    )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-bold text-on-surface">
                       <div className="flex items-center gap-1.5">
@@ -284,8 +289,8 @@ export const MaintenanceList = () => {
                     </option>
                   ))}
                 </select>
-                {formErrors.vehicle_id && (
-                  <p className="text-xs text-error mt-1">{formErrors.vehicle_id[0]}</p>
+                {formErrors.vehicle && (
+                  <p className="text-xs text-error mt-1">{formErrors.vehicle[0]}</p>
                 )}
               </div>
 

@@ -59,10 +59,19 @@ export const FuelExpenses = () => {
   };
 
   const calculateVehicleSummaries = (vehiclesList, fuelData, expData) => {
+    const getVehicleId = (item) => {
+      if (!item) return null;
+      if (item.vehicle_id) return item.vehicle_id;
+      if (item.vehicle) {
+        return typeof item.vehicle === 'object' ? item.vehicle.id : item.vehicle;
+      }
+      return null;
+    };
+
     const summary = vehiclesList.map(vehicle => {
-      const vFuel = fuelData.filter(f => f.vehicle_id === vehicle.id).reduce((sum, f) => sum + f.cost, 0);
-      const vExpMaint = expData.filter(e => e.vehicle_id === vehicle.id && e.expense_type === 'maintenance').reduce((sum, e) => sum + e.amount, 0);
-      const vExpOther = expData.filter(e => e.vehicle_id === vehicle.id && e.expense_type !== 'maintenance').reduce((sum, e) => sum + e.amount, 0);
+      const vFuel = fuelData.filter(f => getVehicleId(f) === vehicle.id).reduce((sum, f) => sum + parseFloat(f.cost || 0), 0);
+      const vExpMaint = expData.filter(e => getVehicleId(e) === vehicle.id && e.expense_type === 'maintenance').reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+      const vExpOther = expData.filter(e => getVehicleId(e) === vehicle.id && e.expense_type !== 'maintenance').reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
       return {
         id: vehicle.id,
         name: vehicle.name_model,
@@ -96,8 +105,8 @@ export const FuelExpenses = () => {
     }
 
     const payload = {
-      vehicle_id: parseInt(fuelVehicleId),
-      trip_id: fuelTripId ? parseInt(fuelTripId) : null,
+      vehicle: parseInt(fuelVehicleId),
+      trip: fuelTripId ? parseInt(fuelTripId) : null,
       liters: parseFloat(liters),
       cost: parseFloat(fuelCost),
       log_date: fuelDate || new Date().toISOString().split('T')[0]
@@ -111,7 +120,11 @@ export const FuelExpenses = () => {
       setFuelTripId('');
       fetchData();
     } catch (err) {
-      setGeneralError(err.error?.message || 'Failed to log fuel');
+      if (err.error?.fields) {
+        setFormErrors(err.error.fields);
+      } else {
+        setGeneralError(err.error?.message || 'Failed to log fuel');
+      }
     }
   };
 
@@ -130,8 +143,7 @@ export const FuelExpenses = () => {
     }
 
     const payload = {
-      vehicle_id: parseInt(expVehicleId),
-      trip_id: expTripId ? parseInt(expTripId) : null,
+      vehicle: parseInt(expVehicleId),
       expense_type: expType,
       amount: parseFloat(expAmount),
       expense_date: expDate || new Date().toISOString().split('T')[0],
@@ -146,7 +158,11 @@ export const FuelExpenses = () => {
       setRemarks('');
       fetchData();
     } catch (err) {
-      setGeneralError(err.error?.message || 'Failed to log expense');
+      if (err.error?.fields) {
+        setFormErrors(err.error.fields);
+      } else {
+        setGeneralError(err.error?.message || 'Failed to log expense');
+      }
     }
   };
 
@@ -338,10 +354,10 @@ export const FuelExpenses = () => {
                       {fuelLogs.map((log) => (
                         <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
                           <td className="px-6 py-3.5">
-                            {log.vehicle_detail ? (
+                            {(log.vehicle_detail || log.vehicle) ? (
                               <div>
-                                <div className="font-bold">{log.vehicle_detail.name_model}</div>
-                                <div className="text-xs font-mono text-primary font-bold">{log.vehicle_detail.registration_number}</div>
+                                <div className="font-bold">{(log.vehicle_detail || log.vehicle).name_model}</div>
+                                <div className="text-xs font-mono text-primary font-bold">{(log.vehicle_detail || log.vehicle).registration_number}</div>
                               </div>
                             ) : 'Unknown'}
                           </td>
@@ -501,10 +517,10 @@ export const FuelExpenses = () => {
                       {expenses.map((exp) => (
                         <tr key={exp.id} className="hover:bg-gray-50/50 transition-colors">
                           <td className="px-6 py-3.5">
-                            {exp.vehicle_detail ? (
+                            {(exp.vehicle_detail || exp.vehicle) ? (
                               <div>
-                                <div className="font-bold">{exp.vehicle_detail.name_model}</div>
-                                <div className="text-xs font-mono text-primary font-bold">{exp.vehicle_detail.registration_number}</div>
+                                <div className="font-bold">{(exp.vehicle_detail || exp.vehicle).name_model}</div>
+                                <div className="text-xs font-mono text-primary font-bold">{(exp.vehicle_detail || exp.vehicle).registration_number}</div>
                               </div>
                             ) : 'Unknown'}
                           </td>

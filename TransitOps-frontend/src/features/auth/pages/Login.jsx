@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { isMockMode } from '../../../api/client';
 import { ShieldCheck, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { isMockMode } from '../../../api/client';
 
 export const Login = () => {
   const { login } = useAuth();
@@ -27,7 +28,11 @@ export const Login = () => {
     setError('');
     setIsSubmitting(true);
     
+<<<<<<< HEAD
     // Attempt login (checks config for mock vs live mode)
+=======
+    // Attempt login
+>>>>>>> e56afb6707786137dfcc3071f7bf38386ac0b547
     const result = await login(email, password, isMockMode());
     
     setIsSubmitting(false);

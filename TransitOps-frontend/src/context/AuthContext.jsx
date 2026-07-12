@@ -1,5 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+<<<<<<< HEAD
 import axios from 'axios';
+=======
+import apiClient from '../api/client';
+>>>>>>> e56afb6707786137dfcc3071f7bf38386ac0b547
 
 const AuthContext = createContext(null);
 
@@ -58,6 +62,7 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(false);
         return { success: true };
       } else {
+<<<<<<< HEAD
         const payload = { email, password };
         const response = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1/'}auth/login/`,
@@ -77,6 +82,22 @@ export const AuthProvider = ({ children }) => {
           return { success: true };
         } else {
           throw new Error(loginData.error?.message || 'Login failed');
+=======
+        const res = await apiClient.post('auth/login/', { email, password });
+        if (res.success && res.data) {
+          const { access, refresh, user: userData } = res.data;
+          
+          localStorage.setItem('transitops_token', access);
+          localStorage.setItem('transitops_refresh_token', refresh);
+          localStorage.setItem('transitops_user', JSON.stringify(userData));
+          
+          setToken(access);
+          setUser(userData);
+          setIsLoading(false);
+          return { success: true };
+        } else {
+          throw new Error(res.message || 'Login failed');
+>>>>>>> e56afb6707786137dfcc3071f7bf38386ac0b547
         }
       }
     } catch (error) {
