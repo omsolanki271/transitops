@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { getTrips, createTrip, dispatchTrip, completeTrip, cancelTrip } from '../../../api/trips';
-import { getVehicles } from '../../../api/vehicles';
-import { getDrivers } from '../../../api/drivers';
+import { getAvailableVehiclesForDispatch } from '../../../api/vehicles';
+import { getAvailableDriversForDispatch } from '../../../api/drivers';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { Search, Plus, MapPin, Navigation, Calendar, User, Truck, X, Eye, ShieldAlert, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
+import { canPerformAction } from '../../../rbac/permissions';
 
 export const TripsList = () => {
+  const { user } = useAuth();
   const [trips, setTrips] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState([]);
@@ -34,14 +37,18 @@ export const TripsList = () => {
 
   const [formErrors, setFormErrors] = useState({});
   const [generalError, setGeneralError] = useState('');
+  const canCreateTrip = canPerformAction(user?.role, 'trips', 'create');
+  const canDispatchTrip = canPerformAction(user?.role, 'trips', 'dispatch');
+  const canCompleteTrip = canPerformAction(user?.role, 'trips', 'complete');
+  const canCancelTrip = canPerformAction(user?.role, 'trips', 'cancel');
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const [tripsResult, vehiclesResult, driversResult] = await Promise.allSettled([
         getTrips({ search, status: filterStatus }),
-        getVehicles(),
-        getDrivers()
+        getAvailableVehiclesForDispatch(),
+        getAvailableDriversForDispatch()
       ]);
       if (tripsResult.status === 'fulfilled') setTrips(tripsResult.value.data);
       if (vehiclesResult.status === 'fulfilled') setVehicles(vehiclesResult.value.data);
@@ -64,10 +71,8 @@ export const TripsList = () => {
   };
 
   // Filter available resources for trip assignment
-  const availableVehicles = vehicles.filter(v => v.status === 'available');
-  const availableDrivers = drivers.filter(d => 
-    d.status === 'available' && !isLicenseExpired(d.license_expiry_date)
-  );
+  const availableVehicles = vehicles;
+  const availableDrivers = drivers;
 
   const openCreateModal = () => {
     setSource('');
@@ -220,13 +225,15 @@ export const TripsList = () => {
           <h2 className="text-xl font-bold text-on-surface m-0 leading-none">Trip Dispatcher</h2>
           <p className="text-xs text-on-surface-variant font-medium mt-1.5 font-sans">Dispatch, track, and close vehicle transport trips</p>
         </div>
-        <button
-          onClick={openCreateModal}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
-        >
-          <Plus className="h-4.5 w-4.5" />
-          <span>Plan Transport Trip</span>
-        </button>
+        {canCreateTrip && (
+          <button
+            onClick={openCreateModal}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
+          >
+            <Plus className="h-4.5 w-4.5" />
+            <span>Plan Transport Trip</span>
+          </button>
+        )}
       </div>
 
       {/* Search & Filter Row */}
@@ -358,7 +365,7 @@ export const TripsList = () => {
 
               {/* Conditional Action Buttons */}
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
-                {trip.status === 'draft' && (
+                {trip.status === 'draft' && canCancelTrip && (
                   <>
                     <button
                       onClick={() => handleCancel(trip.id)}
@@ -366,6 +373,11 @@ export const TripsList = () => {
                     >
                       Cancel Trip
                     </button>
+                  </>
+                )}
+
+                {trip.status === 'draft' && canDispatchTrip && (
+                  <>
                     <button
                       onClick={() => handleDispatch(trip.id)}
                       className="px-3.5 py-2 bg-primary text-white hover:bg-primary-container text-xs font-bold rounded-lg shadow-sm hover:shadow cursor-pointer transition-all"
@@ -375,7 +387,7 @@ export const TripsList = () => {
                   </>
                 )}
 
-                {trip.status === 'dispatched' && (
+                {trip.status === 'dispatched' && canCancelTrip && (
                   <>
                     <button
                       onClick={() => handleCancel(trip.id)}
@@ -383,6 +395,11 @@ export const TripsList = () => {
                     >
                       Cancel Trip
                     </button>
+                  </>
+                )}
+
+                {trip.status === 'dispatched' && canCompleteTrip && (
+                  <>
                     <button
                       onClick={() => openCompleteModal(trip)}
                       className="px-3.5 py-2 bg-green-600 text-white hover:bg-green-700 text-xs font-bold rounded-lg shadow-sm hover:shadow cursor-pointer transition-all"

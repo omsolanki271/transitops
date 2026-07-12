@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { getVehicles, createVehicle, updateVehicle, deleteVehicle } from '../../../api/vehicles';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { Search, Plus, Edit, Trash2, X, AlertCircle } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
+import { canPerformAction } from '../../../rbac/permissions';
 
 export const VehiclesList = () => {
+  const { user } = useAuth();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -27,6 +30,9 @@ export const VehiclesList = () => {
 
   const [formErrors, setFormErrors] = useState({});
   const [generalError, setGeneralError] = useState('');
+  const canCreateVehicle = canPerformAction(user?.role, 'vehicles', 'create');
+  const canUpdateVehicle = canPerformAction(user?.role, 'vehicles', 'update');
+  const canDeleteVehicle = canPerformAction(user?.role, 'vehicles', 'delete');
 
   const fetchVehicles = async () => {
     setLoading(true);
@@ -160,13 +166,15 @@ export const VehiclesList = () => {
           <h2 className="text-xl font-bold text-on-surface m-0 leading-none">Vehicle Directory</h2>
           <p className="text-xs text-on-surface-variant font-medium mt-1.5">Manage and track fleet vehicles</p>
         </div>
-        <button
-          onClick={openCreateModal}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
-        >
-          <Plus className="h-4.5 w-4.5" />
-          <span>Register Vehicle</span>
-        </button>
+        {canCreateVehicle && (
+          <button
+            onClick={openCreateModal}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
+          >
+            <Plus className="h-4.5 w-4.5" />
+            <span>Register Vehicle</span>
+          </button>
+        )}
       </div>
 
       {/* Filters & Search Row */}
@@ -256,14 +264,16 @@ export const VehiclesList = () => {
                     <td className="px-6 py-4 text-center whitespace-nowrap"><StatusBadge status={v.status} /></td>
                     <td className="px-6 py-4 text-center whitespace-nowrap">
                       <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => openEditModal(v)}
-                          className="p-1.5 rounded-lg text-primary hover:bg-primary/10 cursor-pointer transition-colors"
-                          title="Edit Details"
-                        >
-                          <Edit className="h-4.5 w-4.5" />
-                        </button>
-                        {v.status !== 'retired' && (
+                        {canUpdateVehicle && (
+                          <button
+                            onClick={() => openEditModal(v)}
+                            className="p-1.5 rounded-lg text-primary hover:bg-primary/10 cursor-pointer transition-colors"
+                            title="Edit Details"
+                          >
+                            <Edit className="h-4.5 w-4.5" />
+                          </button>
+                        )}
+                        {canDeleteVehicle && v.status !== 'retired' && (
                           <button
                             onClick={() => handleDelete(v.id)}
                             className="p-1.5 rounded-lg text-error hover:bg-error/10 cursor-pointer transition-colors"

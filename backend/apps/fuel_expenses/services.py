@@ -5,7 +5,7 @@ from apps.maintenance.models import MaintenanceLog
 from .models import FuelLog, Expense
 import decimal
 
-def create_fuel_log(data):
+def create_fuel_log(data, user):
     """
     Business service to create a fuel log. Enforces positive inputs.
     """
@@ -17,9 +17,10 @@ def create_fuel_log(data):
     if cost <= 0:
         raise BusinessRuleValidationError("Cost must be positive.", fields={"cost": ["Must be greater than 0."]})
         
+    data['created_by'] = user
     return FuelLog.objects.create(**data)
 
-def create_expense(data):
+def create_expense(data, user):
     """
     Business service to create an expense. Enforces positive inputs.
     """
@@ -28,6 +29,7 @@ def create_expense(data):
     if amount <= 0:
         raise BusinessRuleValidationError("Amount must be positive.", fields={"amount": ["Must be greater than 0."]})
         
+    data['created_by'] = user
     return Expense.objects.create(**data)
 
 def get_vehicle_cost_rollup(vehicle_id):

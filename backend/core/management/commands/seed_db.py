@@ -26,16 +26,16 @@ class Command(BaseCommand):
         Vehicle.objects.all().delete()
 
         self.stdout.write('Creating users...')
-        # Fleet manager
+        # Fleet Manager
         manager = User.objects.create_user(
-            email='manager@transitops.com',
+            email='fleet@transitops.com',
             password='password123',
-            full_name='Ashish Kalsara (Manager)',
+            full_name='Ashish Kalsara (Fleet Manager)',
             role='fleet_manager',
             phone='1234567890'
         )
         
-        # Driver
+        # Dispatcher
         dispatcher_user = User.objects.create_user(
             email='dispatcher@transitops.com',
             password='password123',
@@ -44,20 +44,20 @@ class Command(BaseCommand):
             phone='9876543210'
         )
 
-        # Safety officer
+        # Safety Officer
         safety = User.objects.create_user(
             email='safety@transitops.com',
             password='password123',
-            full_name='Jane Smith (Safety)',
+            full_name='Jane Smith (Safety Officer)',
             role='safety_officer',
             phone='5551234567'
         )
 
-        # Financial analyst
+        # Financial Analyst
         finance = User.objects.create_user(
             email='finance@transitops.com',
             password='password123',
-            full_name='Bob Johnson (Finance)',
+            full_name='Bob Johnson (Financial Analyst)',
             role='financial_analyst',
             phone='4449876543'
         )
@@ -227,6 +227,7 @@ class Command(BaseCommand):
         FuelLog.objects.create(
             vehicle=v1,
             trip=t3,
+            created_by=finance,
             liters=decimal.Decimal('95.00'),
             cost=decimal.Decimal('380.00'),
             log_date=datetime.date.today() - datetime.timedelta(days=2)
@@ -236,6 +237,7 @@ class Command(BaseCommand):
         FuelLog.objects.create(
             vehicle=v1,
             trip=None,
+            created_by=finance,
             liters=decimal.Decimal('120.00'),
             cost=decimal.Decimal('480.00'),
             log_date=datetime.date.today() - datetime.timedelta(days=5)
@@ -244,6 +246,7 @@ class Command(BaseCommand):
         FuelLog.objects.create(
             vehicle=v2,
             trip=None,
+            created_by=manager,
             liters=decimal.Decimal('60.00'),
             cost=decimal.Decimal('240.00'),
             log_date=datetime.date.today() - datetime.timedelta(days=1)
@@ -252,6 +255,7 @@ class Command(BaseCommand):
         # Toll/Other Expenses
         Expense.objects.create(
             vehicle=v1,
+            created_by=finance,
             expense_type='toll',
             amount=decimal.Decimal('75.00'),
             expense_date=datetime.date.today() - datetime.timedelta(days=2),

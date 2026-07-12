@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 from core.response import standard_response
-from core.permissions import IsFleetManagerOrReadOnly
+from core.permissions import CanAccessVehicles
 from .models import Vehicle, Document
 from .serializers import VehicleSerializer, DocumentSerializer
 from .services import create_vehicle, update_vehicle, get_available_vehicles_for_dispatch
@@ -17,7 +17,7 @@ class VehicleViewSet(viewsets.ModelViewSet):
     """
     queryset = Vehicle.objects.all()
     serializer_class = VehicleSerializer
-    permission_classes = [IsFleetManagerOrReadOnly]
+    permission_classes = [CanAccessVehicles]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_fields = ('status', 'vehicle_type', 'region')
     search_fields = ('registration_number', 'name_model')
@@ -74,7 +74,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     """
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
-    permission_classes = [IsFleetManagerOrReadOnly]
+    permission_classes = [CanAccessVehicles]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_fields = ('vehicle', 'document_type')
     search_fields = ('document_type',)

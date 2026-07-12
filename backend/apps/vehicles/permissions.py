@@ -1,1 +1,1 @@
-from core.permissions import IsFleetManagerOrReadOnly
+from core.permissions import CanAccessVehicles as IsFleetManagerOrReadOnly

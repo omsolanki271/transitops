@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { ShieldCheck, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { isMockMode } from '../../../api/client';
+import { DEMO_ACCOUNTS } from '../../../rbac/permissions';
 
 export const Login = () => {
   const { login } = useAuth();
@@ -140,28 +141,28 @@ export const Login = () => {
             <div className="grid grid-cols-2 gap-2 text-center">
               <button
                 type="button"
-                onClick={() => handleQuickFill('manager@transitops.com')}
+                onClick={() => handleQuickFill(DEMO_ACCOUNTS.fleet_manager.email)}
                 className="px-2.5 py-2 border border-gray-200 rounded-md text-xs font-medium text-on-surface bg-gray-50 hover:bg-gray-100 hover:border-gray-300 transition-colors duration-150 cursor-pointer"
               >
                 Fleet Manager
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickFill('dispatcher@transitops.com')}
+                onClick={() => handleQuickFill(DEMO_ACCOUNTS.dispatcher.email)}
                 className="px-2.5 py-2 border border-gray-200 rounded-md text-xs font-medium text-on-surface bg-gray-50 hover:bg-gray-100 hover:border-gray-300 transition-colors duration-150 cursor-pointer"
               >
                 Dispatcher
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickFill('safety@transitops.com')}
+                onClick={() => handleQuickFill(DEMO_ACCOUNTS.safety_officer.email)}
                 className="px-2.5 py-2 border border-gray-200 rounded-md text-xs font-medium text-on-surface bg-gray-50 hover:bg-gray-100 hover:border-gray-300 transition-colors duration-150 cursor-pointer"
               >
                 Safety Officer
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickFill('finance@transitops.com')}
+                onClick={() => handleQuickFill(DEMO_ACCOUNTS.financial_analyst.email)}
                 className="px-2.5 py-2 border border-gray-200 rounded-md text-xs font-medium text-on-surface bg-gray-50 hover:bg-gray-100 hover:border-gray-300 transition-colors duration-150 cursor-pointer"
               >
                 Financial Analyst

@@ -1,1 +1,1 @@
-from core.permissions import CanManageFuelExpenses
+from core.permissions import CanAccessFuelExpenses as CanManageFuelExpenses

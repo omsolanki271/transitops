@@ -34,6 +34,18 @@ export const getVehicles = async (filters = {}) => {
   return apiClient.get('/vehicles/', { params: filters });
 };
 
+export const getAvailableVehiclesForDispatch = async () => {
+  if (isMockMode()) {
+    const vehicles = mockDb.getVehicles().filter(v => v.status === 'available');
+    return {
+      success: true,
+      data: vehicles
+    };
+  }
+
+  return apiClient.get('/vehicles/available-for-dispatch/');
+};
+
 export const getVehicle = async (id) => {
   if (isMockMode()) {
     const vehicle = mockDb.getVehicle(id);

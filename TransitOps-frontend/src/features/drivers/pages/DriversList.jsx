@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { getDrivers, createDriver, updateDriver } from '../../../api/drivers';
 import { StatusBadge } from '../../../components/common/StatusBadge';
 import { Search, Plus, Edit, X, AlertCircle, Calendar, ShieldCheck as SafetyIcon } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
+import { canPerformAction } from '../../../rbac/permissions';
 
 export const DriversList = () => {
+  const { user } = useAuth();
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -25,6 +28,14 @@ export const DriversList = () => {
 
   const [formErrors, setFormErrors] = useState({});
   const [generalError, setGeneralError] = useState('');
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+  const canCreateDriver = canPerformAction(user?.role, 'drivers', 'create');
+  const canUpdateDriver = canPerformAction(user?.role, 'drivers', 'update');
 
   const fetchDrivers = async () => {
     setLoading(true);
@@ -65,7 +76,13 @@ export const DriversList = () => {
     setSelectedId(driver.id);
     setName(driver.name);
     setLicenseNo(driver.license_number);
-    setLicenseCat(driver.license_category);
+    
+    // Normalize seed data values for safe matching in select input
+    let cat = driver.license_category;
+    if (cat === 'heavy_vehicle') cat = 'HMV';
+    if (cat === 'light_vehicle') cat = 'LMV';
+    setLicenseCat(cat);
+    
     setLicenseExpiry(driver.license_expiry_date);
     setContactNo(driver.contact_number);
     setSafetyScore(driver.safety_score);
@@ -84,10 +101,21 @@ export const DriversList = () => {
     const errors = {};
     if (!name) errors.name = ['Driver name is required'];
     if (!licenseNo) errors.license_number = ['License number is required'];
-    if (!licenseExpiry) errors.license_expiry_date = ['License expiry date is required'];
+    
+    if (!licenseExpiry) {
+      errors.license_expiry_date = ['License expiry date is required'];
+    } else {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const expiry = new Date(licenseExpiry);
+      if (expiry < today) {
+        errors.license_expiry_date = ['License expiry date must be a valid future date'];
+      }
+    }
+    
     if (!contactNo) errors.contact_number = ['Contact number is required'];
     
-    const score = parseInt(safetyScore);
+    const score = parseFloat(safetyScore);
     if (isNaN(score) || score < 0 || score > 100) {
       errors.safety_score = ['Safety score must be between 0 and 100'];
     }
@@ -110,8 +138,10 @@ export const DriversList = () => {
     try {
       if (isEditing) {
         await updateDriver(selectedId, payload);
+        showToast('Driver updated successfully.', 'success');
       } else {
         await createDriver(payload);
+        showToast('Driver registered successfully.', 'success');
       }
       setShowModal(false);
       fetchDrivers();
@@ -139,13 +169,15 @@ export const DriversList = () => {
           <h2 className="text-xl font-bold text-on-surface m-0 leading-none">Driver Rosters</h2>
           <p className="text-xs text-on-surface-variant font-medium mt-1.5 font-sans">Manage vehicle drivers and license compliance checks</p>
         </div>
-        <button
-          onClick={openCreateModal}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
-        >
-          <Plus className="h-4.5 w-4.5" />
-          <span>Add Driver Profile</span>
-        </button>
+        {canCreateDriver && (
+          <button
+            onClick={openCreateModal}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
+          >
+            <Plus className="h-4.5 w-4.5" />
+            <span>Add Driver Profile</span>
+          </button>
+        )}
       </div>
 
       {/* Filters Search Row */}
@@ -240,13 +272,15 @@ export const DriversList = () => {
                         <StatusBadge status={d.status} />
                       </td>
                       <td className="px-6 py-4 text-center whitespace-nowrap">
-                        <button
-                          onClick={() => openEditModal(d)}
-                          className="p-1.5 rounded-lg text-primary hover:bg-primary/10 cursor-pointer transition-colors"
-                          title="Edit Details"
-                        >
-                          <Edit className="h-4.5 w-4.5" />
-                        </button>
+                        {canUpdateDriver && (
+                          <button
+                            onClick={() => openEditModal(d)}
+                            className="p-1.5 rounded-lg text-primary hover:bg-primary/10 cursor-pointer transition-colors"
+                            title="Edit Details"
+                          >
+                            <Edit className="h-4.5 w-4.5" />
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
@@ -291,9 +325,10 @@ export const DriversList = () => {
                   <input
                     type="text"
                     required
+                    disabled={isEditing && user?.role === 'safety_officer'}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                     placeholder="Sanjay Kumar"
                   />
                   {formErrors.name && (
@@ -309,9 +344,10 @@ export const DriversList = () => {
                   <input
                     type="text"
                     required
+                    disabled={isEditing && user?.role === 'safety_officer'}
                     value={contactNo}
                     onChange={(e) => setContactNo(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                     placeholder="+91 98765 43210"
                   />
                   {formErrors.contact_number && (
@@ -347,8 +383,10 @@ export const DriversList = () => {
                     onChange={(e) => setLicenseCat(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium cursor-pointer"
                   >
-                    <option value="HMV">HMV (Heavy Motor Vehicle)</option>
-                    <option value="LMV">LMV (Light Motor Vehicle)</option>
+                    <option value="LMV">LMV</option>
+                    <option value="HMV">HMV</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Heavy Motor Vehicle">Heavy Motor Vehicle</option>
                   </select>
                 </div>
 
@@ -379,6 +417,7 @@ export const DriversList = () => {
                     required
                     min="0"
                     max="100"
+                    step="any"
                     value={safetyScore}
                     onChange={(e) => setSafetyScore(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium"
@@ -425,6 +464,16 @@ export const DriversList = () => {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {toast && (
+        <div className={`fixed bottom-5 right-5 z-50 flex items-center gap-2 text-white px-4 py-3 rounded-xl shadow-lg border animate-fade-in font-medium text-sm ${
+          toast.type === 'success' 
+            ? 'bg-green-600 border-green-500/20' 
+            : 'bg-red-600 border-red-500/20'
+        }`}>
+          <span>{toast.message}</span>
         </div>
       )}
     </div>

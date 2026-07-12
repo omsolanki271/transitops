@@ -18,24 +18,24 @@ const INITIAL_DRIVERS = [
 ];
 
 const INITIAL_TRIPS = [
-  { id: 1, source: 'Mumbai (MH)', destination: 'Pune (MH)', vehicle_id: 2, driver_id: 2, cargo_weight: 12000, planned_distance: 150, actual_distance: null, final_odometer: null, fuel_consumed: null, status: 'dispatched', dispatched_at: '2026-07-12T05:00:00Z', completed_at: null, cancelled_at: null, revenue: 45000 },
-  { id: 2, source: 'Delhi (DL)', destination: 'Jaipur (RJ)', vehicle_id: 1, driver_id: 1, cargo_weight: 35000, planned_distance: 280, actual_distance: 275, final_odometer: 12775, fuel_consumed: 95, status: 'completed', dispatched_at: '2026-07-11T08:00:00Z', completed_at: '2026-07-11T16:00:00Z', cancelled_at: null, revenue: 85000 },
-  { id: 3, source: 'Bangalore (KA)', destination: 'Chennai (TN)', vehicle_id: 4, driver_id: 3, cargo_weight: 22000, planned_distance: 350, actual_distance: null, final_odometer: null, fuel_consumed: null, status: 'draft', dispatched_at: null, completed_at: null, cancelled_at: null, revenue: 65000 }
+  { id: 1, source: 'Mumbai (MH)', destination: 'Pune (MH)', vehicle_id: 2, driver_id: 2, cargo_weight: 12000, planned_distance: 150, actual_distance: null, final_odometer: null, fuel_consumed: null, status: 'dispatched', dispatched_at: '2026-07-12T05:00:00Z', completed_at: null, cancelled_at: null, revenue: 45000, created_by: 1 },
+  { id: 2, source: 'Delhi (DL)', destination: 'Jaipur (RJ)', vehicle_id: 1, driver_id: 1, cargo_weight: 35000, planned_distance: 280, actual_distance: 275, final_odometer: 12775, fuel_consumed: 95, status: 'completed', dispatched_at: '2026-07-11T08:00:00Z', completed_at: '2026-07-11T16:00:00Z', cancelled_at: null, revenue: 85000, created_by: 1 },
+  { id: 3, source: 'Bangalore (KA)', destination: 'Chennai (TN)', vehicle_id: 4, driver_id: 3, cargo_weight: 22000, planned_distance: 350, actual_distance: null, final_odometer: null, fuel_consumed: null, status: 'draft', dispatched_at: null, completed_at: null, cancelled_at: null, revenue: 65000, created_by: 2 }
 ];
 
 const INITIAL_MAINTENANCE = [
-  { id: 1, vehicle_id: 3, maintenance_type: 'Engine Overhaul', description: 'Complete engine diagnostics and cylinder replacement.', cost: 45000, status: 'open', started_at: '2026-07-10T10:00:00Z', closed_at: null },
-  { id: 2, vehicle_id: 2, maintenance_type: 'Brake Replacement', description: 'Front and rear brake pads replacement and rotor machining.', cost: 12500, status: 'closed', started_at: '2026-07-05T09:00:00Z', closed_at: '2026-07-05T17:00:00Z' }
+  { id: 1, vehicle_id: 3, maintenance_type: 'Engine Overhaul', description: 'Complete engine diagnostics and cylinder replacement.', cost: 45000, status: 'open', started_at: '2026-07-10T10:00:00Z', closed_at: null, created_by: 1 },
+  { id: 2, vehicle_id: 2, maintenance_type: 'Brake Replacement', description: 'Front and rear brake pads replacement and rotor machining.', cost: 12500, status: 'closed', started_at: '2026-07-05T09:00:00Z', closed_at: '2026-07-05T17:00:00Z', created_by: 1 }
 ];
 
 const INITIAL_FUEL = [
-  { id: 1, vehicle_id: 2, trip_id: 1, liters: 45, cost: 4200, log_date: '2026-07-12' },
-  { id: 2, vehicle_id: 1, trip_id: 2, liters: 95, cost: 8900, log_date: '2026-07-11' }
+  { id: 1, vehicle_id: 2, trip_id: 1, liters: 45, cost: 4200, log_date: '2026-07-12', created_by: 4 },
+  { id: 2, vehicle_id: 1, trip_id: 2, liters: 95, cost: 8900, log_date: '2026-07-11', created_by: 4 }
 ];
 
 const INITIAL_EXPENSES = [
-  { id: 1, vehicle_id: 2, trip_id: 1, expense_type: 'toll', amount: 800, expense_date: '2026-07-12', description: 'Mumbai-Pune Expressway Toll' },
-  { id: 2, vehicle_id: 1, trip_id: 2, expense_type: 'other', amount: 1500, expense_date: '2026-07-11', description: 'Driver overnight allowance' }
+  { id: 1, vehicle_id: 2, trip_id: 1, expense_type: 'toll', amount: 800, expense_date: '2026-07-12', description: 'Mumbai-Pune Expressway Toll', created_by: 4 },
+  { id: 2, vehicle_id: 1, trip_id: 2, expense_type: 'other', amount: 1500, expense_date: '2026-07-11', description: 'Driver overnight allowance', created_by: 4 }
 ];
 
 // Helper to initialize local storage
@@ -65,6 +65,13 @@ initLocalStorage();
 // Generic helpers
 const getData = (key) => JSON.parse(localStorage.getItem(key));
 const setData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+const getCurrentUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('transitops_user'));
+  } catch {
+    return null;
+  }
+};
 
 export const mockDb = {
   // VEHICLES CRUD
@@ -220,7 +227,8 @@ export const mockDb = {
       dispatched_at: null,
       completed_at: null,
       cancelled_at: null,
-      revenue: parseFloat(tripData.revenue) || 0
+      revenue: parseFloat(tripData.revenue) || 0,
+      created_by: getCurrentUser()?.id || null
     };
     
     trips.push(newTrip);
@@ -367,7 +375,8 @@ export const mockDb = {
       cost: parseFloat(logData.cost) || 0,
       status: 'open',
       started_at: new Date().toISOString(),
-      closed_at: null
+      closed_at: null,
+      created_by: getCurrentUser()?.id || null
     };
 
     // Also automatically log in general expenses
@@ -426,7 +435,8 @@ export const mockDb = {
       trip_id: fuelData.trip_id ? parseInt(fuelData.trip_id) : null,
       liters: parseFloat(fuelData.liters),
       cost: parseFloat(fuelData.cost),
-      log_date: fuelData.log_date || new Date().toISOString().split('T')[0]
+      log_date: fuelData.log_date || new Date().toISOString().split('T')[0],
+      created_by: getCurrentUser()?.id || null
     };
     logs.push(newLog);
     setData('transitops_mock_fuel', logs);
@@ -465,11 +475,42 @@ export const mockDb = {
       expense_type: expenseData.expense_type,
       amount: parseFloat(expenseData.amount),
       expense_date: expenseData.expense_date || new Date().toISOString().split('T')[0],
-      description: expenseData.description || ''
+      description: expenseData.description || '',
+      created_by: getCurrentUser()?.id || null
     };
     expenses.push(newExpense);
     setData('transitops_mock_expenses', expenses);
     return newExpense;
+  },
+
+  updateFuelLog: (id, fuelData) => {
+    const logs = getData('transitops_mock_fuel');
+    const idx = logs.findIndex(l => l.id === parseInt(id));
+    if (idx === -1) throw new Error('Fuel log not found');
+    logs[idx] = { ...logs[idx], ...fuelData };
+    setData('transitops_mock_fuel', logs);
+    return logs[idx];
+  },
+
+  deleteFuelLog: (id) => {
+    const logs = getData('transitops_mock_fuel').filter(l => l.id !== parseInt(id));
+    setData('transitops_mock_fuel', logs);
+    return true;
+  },
+
+  updateExpense: (id, expenseData) => {
+    const expenses = getData('transitops_mock_expenses');
+    const idx = expenses.findIndex(e => e.id === parseInt(id));
+    if (idx === -1) throw new Error('Expense not found');
+    expenses[idx] = { ...expenses[idx], ...expenseData };
+    setData('transitops_mock_expenses', expenses);
+    return expenses[idx];
+  },
+
+  deleteExpense: (id) => {
+    const expenses = getData('transitops_mock_expenses').filter(e => e.id !== parseInt(id));
+    setData('transitops_mock_expenses', expenses);
+    return true;
   },
 
   // REPORTS & DASHBOARD METRICS CALCULATOR

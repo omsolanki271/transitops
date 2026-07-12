@@ -6,7 +6,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from core.response import standard_response
 from .models import Trip
 from .serializers import TripSerializer, TripCompleteSerializer
-from .permissions import CanManageTrips
+from core.permissions import CanAccessTrips
 from .services import create_trip, update_trip, dispatch_trip, complete_trip, cancel_trip
 
 class TripViewSet(viewsets.ModelViewSet):
@@ -16,7 +16,7 @@ class TripViewSet(viewsets.ModelViewSet):
     """
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
-    permission_classes = [CanManageTrips]
+    permission_classes = [CanAccessTrips]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_fields = ('status', 'vehicle', 'driver')
     search_fields = ('source', 'destination', 'vehicle__registration_number', 'driver__name')

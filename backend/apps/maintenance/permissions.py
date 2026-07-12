@@ -1,1 +1,1 @@
-from core.permissions import CanManageMaintenance
+from core.permissions import CanAccessMaintenance as CanManageMaintenance

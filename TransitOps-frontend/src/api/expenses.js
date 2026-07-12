@@ -61,3 +61,51 @@ export const createFuelLog = async (fuelData) => {
   }
   return apiClient.post('/fuel-logs/', fuelData);
 };
+
+export const updateFuelLog = async (id, fuelData) => {
+  if (isMockMode()) {
+    try {
+      const updated = mockDb.updateFuelLog(id, fuelData);
+      return { success: true, data: updated };
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+  return apiClient.patch(`/fuel-logs/${id}/`, fuelData);
+};
+
+export const deleteFuelLog = async (id) => {
+  if (isMockMode()) {
+    try {
+      mockDb.deleteFuelLog(id);
+      return { success: true };
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+  return apiClient.delete(`/fuel-logs/${id}/`);
+};
+
+export const updateExpense = async (id, expenseData) => {
+  if (isMockMode()) {
+    try {
+      const updated = mockDb.updateExpense(id, expenseData);
+      return { success: true, data: updated };
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+  return apiClient.patch(`/expenses/${id}/`, expenseData);
+};
+
+export const deleteExpense = async (id) => {
+  if (isMockMode()) {
+    try {
+      mockDb.deleteExpense(id);
+      return { success: true };
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+  return apiClient.delete(`/expenses/${id}/`);
+};

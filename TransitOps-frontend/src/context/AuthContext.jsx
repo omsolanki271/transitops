@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import apiClient from '../api/client';
+import { DEMO_ACCOUNTS, getDemoAccountByEmail, normalizeRole } from '../rbac/permissions';
 
 const AuthContext = createContext(null);
 
@@ -18,11 +19,8 @@ export const AuthProvider = ({ children }) => {
     if (savedToken && savedUser) {
       const parsedUser = JSON.parse(savedUser);
 
-      // Migrate stale 'driver' role to 'dispatcher' after the role rename
-      if (parsedUser.role === 'driver') {
-        parsedUser.role = 'dispatcher';
-        localStorage.setItem('transitops_user', JSON.stringify(parsedUser));
-      }
+      parsedUser.role = normalizeRole(parsedUser.role);
+      localStorage.setItem('transitops_user', JSON.stringify(parsedUser));
 
       setToken(savedToken);
       setUser(parsedUser);
@@ -34,25 +32,13 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     try {
       if (useMock) {
-        // Mock authentication logic
-        let role = 'fleet_manager'; // Default role
-        let name = 'Om Solanki';
-
-        if (email.includes('dispatcher') || email.includes('driver')) {
-          role = 'dispatcher';
-          name = 'John Doe (Dispatcher)';
-        } else if (email.includes('safety')) {
-          role = 'safety_officer';
-          name = 'Jane Smith (Safety)';
-        } else if (email.includes('finance')) {
-          role = 'financial_analyst';
-          name = 'Bob Johnson (Finance)';
-        }
+        const demoAccount = getDemoAccountByEmail(email) || DEMO_ACCOUNTS[normalizeRole('fleet_manager')];
+        const role = Object.entries(DEMO_ACCOUNTS).find(([, account]) => account.email === demoAccount.email)?.[0] || 'fleet_manager';
 
         const mockUser = {
-          id: 1,
-          name,
-          email,
+          id: role === 'fleet_manager' ? 1 : role === 'dispatcher' ? 2 : role === 'safety_officer' ? 3 : 4,
+          name: demoAccount.name,
+          email: demoAccount.email,
           role,
         };
 

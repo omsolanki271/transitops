@@ -1,1 +1,1 @@
-from core.permissions import CanManageDrivers
+from core.permissions import CanAccessDrivers as CanManageDrivers

@@ -31,18 +31,11 @@ def validate_trip_assignment(vehicle, driver, cargo_weight, is_dispatch=False, t
             fields={"vehicle": ["Vehicle is in shop."]}
         )
     
-    # If dispatching (or if we are checking active availability), check if resource is already on a trip
-    # If the vehicle is currently on a trip and it is NOT this trip, reject.
     if vehicle.status == 'on_trip':
-        # Check if there is an active trip on this vehicle that is not the current one
-        active_trips = Trip.objects.filter(vehicle=vehicle, status='dispatched')
-        if trip_id:
-            active_trips = active_trips.exclude(id=trip_id)
-        if active_trips.exists():
-            raise BusinessRuleValidationError(
-                "Vehicle already on trip cannot receive another trip.",
-                fields={"vehicle": ["Vehicle is currently assigned to another active trip."]}
-            )
+        raise BusinessRuleValidationError(
+            "Vehicle already on trip cannot receive another trip.",
+            fields={"vehicle": ["Vehicle is currently on an active trip."]}
+        )
 
     # 3. Driver availability & compliance checks
     if driver.license_expiry_date < datetime.date.today():
@@ -62,15 +55,10 @@ def validate_trip_assignment(vehicle, driver, cargo_weight, is_dispatch=False, t
         )
     
     if driver.status == 'on_trip':
-        # Check if there is an active trip on this driver that is not the current one
-        active_trips = Trip.objects.filter(driver=driver, status='dispatched')
-        if trip_id:
-            active_trips = active_trips.exclude(id=trip_id)
-        if active_trips.exists():
-            raise BusinessRuleValidationError(
-                "Driver already on trip cannot receive another trip.",
-                fields={"driver": ["Driver is currently assigned to another active trip."]}
-            )
+        raise BusinessRuleValidationError(
+            "Driver already on trip cannot receive another trip.",
+            fields={"driver": ["Driver is currently on an active trip."]}
+        )
 
 def create_trip(data, user):
     """
@@ -212,8 +200,7 @@ def complete_trip(trip_id, final_odometer, fuel_consumed, actual_distance):
     
     # Restore Driver
     driver = trip.driver
-    if driver.status != 'suspended':
-        driver.status = 'available'
+    driver.status = 'available'
     driver.save()
     
     return trip
@@ -240,13 +227,11 @@ def cancel_trip(trip_id):
     # Restore resources if they were already dispatched
     if original_status == 'dispatched':
         vehicle = trip.vehicle
-        if vehicle.status == 'on_trip':
-            vehicle.status = 'available'
-            vehicle.save()
+        vehicle.status = 'available'
+        vehicle.save()
             
         driver = trip.driver
-        if driver.status == 'on_trip':
-            driver.status = 'available'
-            driver.save()
+        driver.status = 'available'
+        driver.save()
             
     return trip

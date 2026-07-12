@@ -11,6 +11,7 @@ import { TripsList } from './features/trips/pages/TripsList';
 import { MaintenanceList } from './features/maintenance/pages/MaintenanceList';
 import { FuelExpenses } from './features/fuel-expenses/pages/FuelExpenses';
 import { Reports } from './features/reports/pages/Reports';
+import { ROUTE_ACCESS } from './rbac/permissions';
 
 function App() {
   return (
@@ -31,12 +32,19 @@ function App() {
           >
             <Route index element={<Navigate to="/dashboard" replace />} />
             
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route 
+              path="dashboard" 
+              element={
+                <ProtectedRoute allowedRoles={ROUTE_ACCESS.dashboard}>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
             
             <Route 
               path="vehicles" 
               element={
-                <ProtectedRoute allowedRoles={['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']}>
+                <ProtectedRoute allowedRoles={ROUTE_ACCESS.vehicles}>
                   <VehiclesList />
                 </ProtectedRoute>
               } 
@@ -45,18 +53,25 @@ function App() {
             <Route 
               path="drivers" 
               element={
-                <ProtectedRoute allowedRoles={['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']}>
+                <ProtectedRoute allowedRoles={ROUTE_ACCESS.drivers}>
                   <DriversList />
                 </ProtectedRoute>
               } 
             />
             
-            <Route path="trips" element={<TripsList />} />
+            <Route 
+              path="trips" 
+              element={
+                <ProtectedRoute allowedRoles={ROUTE_ACCESS.trips}>
+                  <TripsList />
+                </ProtectedRoute>
+              } 
+            />
             
             <Route 
               path="maintenance" 
               element={
-                <ProtectedRoute allowedRoles={['fleet_manager', 'safety_officer', 'financial_analyst']}>
+                <ProtectedRoute allowedRoles={ROUTE_ACCESS.maintenance}>
                   <MaintenanceList />
                 </ProtectedRoute>
               } 
@@ -65,7 +80,7 @@ function App() {
             <Route 
               path="expenses" 
               element={
-                <ProtectedRoute allowedRoles={['fleet_manager', 'financial_analyst']}>
+                <ProtectedRoute allowedRoles={ROUTE_ACCESS.expenses}>
                   <FuelExpenses />
                 </ProtectedRoute>
               } 
@@ -74,7 +89,7 @@ function App() {
             <Route 
               path="reports" 
               element={
-                <ProtectedRoute allowedRoles={['fleet_manager', 'safety_officer', 'financial_analyst']}>
+                <ProtectedRoute allowedRoles={ROUTE_ACCESS.reports}>
                   <Reports />
                 </ProtectedRoute>
               } 

@@ -5,7 +5,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from core.response import standard_response
 from .models import FuelLog, Expense
 from .serializers import FuelLogSerializer, ExpenseSerializer
-from .permissions import CanManageFuelExpenses
+from core.permissions import CanAccessFuelExpenses
 from .services import create_fuel_log, create_expense
 
 class FuelLogViewSet(viewsets.ModelViewSet):
@@ -15,7 +15,7 @@ class FuelLogViewSet(viewsets.ModelViewSet):
     """
     queryset = FuelLog.objects.all()
     serializer_class = FuelLogSerializer
-    permission_classes = [CanManageFuelExpenses]
+    permission_classes = [CanAccessFuelExpenses]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_fields = ('vehicle', 'trip')
     search_fields = ('vehicle__registration_number',)
@@ -38,7 +38,7 @@ class FuelLogViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        log = create_fuel_log(serializer.validated_data)
+        log = create_fuel_log(serializer.validated_data, request.user)
         return standard_response(success=True, data=self.get_serializer(log).data, status_code=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
@@ -62,7 +62,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     """
     queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
-    permission_classes = [CanManageFuelExpenses]
+    permission_classes = [CanAccessFuelExpenses]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_fields = ('vehicle', 'expense_type')
     search_fields = ('vehicle__registration_number', 'description')
@@ -85,7 +85,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        expense = create_expense(serializer.validated_data)
+        expense = create_expense(serializer.validated_data, request.user)
         return standard_response(success=True, data=self.get_serializer(expense).data, status_code=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):

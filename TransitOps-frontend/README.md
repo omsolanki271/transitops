@@ -49,7 +49,7 @@ npm run dev
 
 To test specific views and access rights, use these quick-fill email shortcuts on the login screen (with any password):
 
-*   **Fleet Manager**: `manager@transitops.com` (Full Access)
+*   **Fleet Manager**: `fleet@transitops.com` (Full Access)
 *   **Driver / Dispatcher**: `driver@transitops.com` (Trips & Expenses)
 *   **Safety Officer**: `safety@transitops.com` (Vehicles, Drivers, Trips, Maintenance, Reports - Read Only/Compliance)
 *   **Financial Analyst**: `finance@transitops.com` (Vehicles, Drivers, Trips, Maintenance, Expenses, Reports - Read Only/ROI)

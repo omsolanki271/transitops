@@ -28,6 +28,20 @@ export const getDrivers = async (filters = {}) => {
   return apiClient.get('/drivers/', { params: filters });
 };
 
+export const getAvailableDriversForDispatch = async () => {
+  if (isMockMode()) {
+    const drivers = mockDb.getDrivers().filter(
+      (driver) => driver.status === 'available' && new Date(driver.license_expiry_date) >= new Date()
+    );
+    return {
+      success: true,
+      data: drivers
+    };
+  }
+
+  return apiClient.get('/drivers/available-for-dispatch/');
+};
+
 export const getDriver = async (id) => {
   if (isMockMode()) {
     const driver = mockDb.getDriver(id);

@@ -2,21 +2,11 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { LogOut, User as UserIcon } from 'lucide-react';
+import { getRoleLabel } from '../../rbac/permissions';
 
 export const Topbar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
-
-  // Get human readable role
-  const getRoleLabel = (role) => {
-    const roles = {
-      fleet_manager: 'Fleet Manager',
-      dispatcher: 'Dispatcher',
-      safety_officer: 'Safety Officer',
-      financial_analyst: 'Financial Analyst'
-    };
-    return roles[role] || role;
-  };
 
   // Get dynamic title based on active path
   const getPageTitle = () => {

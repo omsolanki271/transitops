@@ -85,7 +85,7 @@ Seed the database with sample data (demo users, vehicles, drivers, trips, mainte
 python manage.py seed_db
 ```
 This creates the following default demo credentials (password for all is `password123`):
-- **Fleet Manager**: `manager@transitops.com`
+- **Fleet Manager**: `fleet@transitops.com`
 - **Driver**: `driver@transitops.com`
 - **Safety Officer**: `safety@transitops.com`
 - **Financial Analyst**: `finance@transitops.com`

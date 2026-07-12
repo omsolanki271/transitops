@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ShieldCheck
 } from 'lucide-react';
+import { getVisibleNavItems } from '../../rbac/permissions';
 
 export const Sidebar = () => {
   const { user } = useAuth();
@@ -20,55 +21,20 @@ export const Sidebar = () => {
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  // Role nav permissions config
-  const navItems = [
-    {
-      name: 'Dashboard',
-      path: '/dashboard',
-      icon: LayoutDashboard,
-      allowedRoles: ['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']
-    },
-    {
-      name: 'Vehicles',
-      path: '/vehicles',
-      icon: Truck,
-      allowedRoles: ['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']
-    },
-    {
-      name: 'Drivers',
-      path: '/drivers',
-      icon: Users,
-      allowedRoles: ['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']
-    },
-    {
-      name: 'Trips',
-      path: '/trips',
-      icon: Map,
-      allowedRoles: ['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']
-    },
-    {
-      name: 'Maintenance',
-      path: '/maintenance',
-      icon: Wrench,
-      allowedRoles: ['fleet_manager', 'safety_officer', 'financial_analyst']
-    },
-    {
-      name: 'Fuel & Expenses',
-      path: '/expenses',
-      icon: Receipt,
-      allowedRoles: ['fleet_manager', 'financial_analyst']
-    },
-    {
-      name: 'Reports & Analytics',
-      path: '/reports',
-      icon: BarChart3,
-      allowedRoles: ['fleet_manager', 'safety_officer', 'financial_analyst']
-    }
-  ];
+  const navIconMap = {
+    Dashboard: LayoutDashboard,
+    Vehicles: Truck,
+    Drivers: Users,
+    Trips: Map,
+    Maintenance: Wrench,
+    'Fuel & Expenses': Receipt,
+    'Reports & Analytics': BarChart3
+  };
 
-  const filteredNavItems = navItems.filter(item => 
-    !user || item.allowedRoles.includes(user.role)
-  );
+  const navItems = getVisibleNavItems(user?.role).map((item) => ({
+    ...item,
+    icon: navIconMap[item.name] || LayoutDashboard
+  }));
 
   return (
     <div 
@@ -95,7 +61,7 @@ export const Sidebar = () => {
 
       {/* Nav List */}
       <nav className="flex-1 px-2 py-4 space-y-1 select-none overflow-y-auto">
-        {filteredNavItems.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           return (
             <NavLink

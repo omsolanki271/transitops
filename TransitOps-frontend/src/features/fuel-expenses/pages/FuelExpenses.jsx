@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { getExpenses, createExpense, getFuelLogs, createFuelLog } from '../../../api/expenses';
+import { getExpenses, createExpense, getFuelLogs, createFuelLog, updateExpense, deleteExpense, updateFuelLog, deleteFuelLog } from '../../../api/expenses';
 import { getVehicles } from '../../../api/vehicles';
 import { getTrips } from '../../../api/trips';
 import { Plus, Fuel, DollarSign, ListFilter, AlertCircle, Calendar, FileText, Truck } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
+import { canPerformAction } from '../../../rbac/permissions';
 
 export const FuelExpenses = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('fuel'); // 'fuel' | 'expenses' | 'summary'
   const [vehicles, setVehicles] = useState([]);
   const [trips, setTrips] = useState([]);
@@ -25,6 +28,8 @@ export const FuelExpenses = () => {
   const [expAmount, setExpAmount] = useState('');
   const [expDate, setExpDate] = useState('');
   const [remarks, setRemarks] = useState('');
+  const [editingFuelId, setEditingFuelId] = useState(null);
+  const [editingExpenseId, setEditingExpenseId] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [formErrors, setFormErrors] = useState({});
@@ -32,6 +37,10 @@ export const FuelExpenses = () => {
 
   // Per-vehicle cost calculation summaries
   const [vehicleCostSummary, setVehicleCostSummary] = useState([]);
+  const canCreateFuel = canPerformAction(user?.role, 'fuel_expenses', 'createFuel');
+  const canCreateExpense = canPerformAction(user?.role, 'fuel_expenses', 'createExpense');
+  const canUpdateOwn = canPerformAction(user?.role, 'fuel_expenses', 'updateOwn');
+  const canDeleteOwn = canPerformAction(user?.role, 'fuel_expenses', 'deleteOwn');
 
   const fetchData = async () => {
     setLoading(true);
@@ -113,11 +122,17 @@ export const FuelExpenses = () => {
     };
 
     try {
-      await createFuelLog(payload);
+      if (editingFuelId) {
+        await updateFuelLog(editingFuelId, payload);
+      } else {
+        await createFuelLog(payload);
+      }
       setLiters('');
       setFuelCost('');
       setFuelVehicleId('');
       setFuelTripId('');
+      setFuelDate('');
+      setEditingFuelId(null);
       fetchData();
     } catch (err) {
       if (err.error?.fields) {
@@ -151,11 +166,17 @@ export const FuelExpenses = () => {
     };
 
     try {
-      await createExpense(payload);
+      if (editingExpenseId) {
+        await updateExpense(editingExpenseId, payload);
+      } else {
+        await createExpense(payload);
+      }
       setExpAmount('');
       setExpVehicleId('');
       setExpTripId('');
       setRemarks('');
+      setExpDate('');
+      setEditingExpenseId(null);
       fetchData();
     } catch (err) {
       if (err.error?.fields) {
@@ -173,6 +194,43 @@ export const FuelExpenses = () => {
   const formatExpType = (type) => {
     const types = { toll: 'Tolls', maintenance: 'Maintenance', other: 'Others' };
     return types[type] || type;
+  };
+
+  const getOwnerId = (record) => record?.created_by?.id || record?.created_by || null;
+
+  const openFuelEdit = (log) => {
+    setActiveTab('fuel');
+    setEditingFuelId(log.id);
+    setFuelVehicleId(String(log.vehicle_id || log.vehicle?.id || log.vehicle_detail?.id || ''));
+    setFuelTripId(String(log.trip_id || log.trip?.id || ''));
+    setLiters(String(log.liters || ''));
+    setFuelCost(String(log.cost || ''));
+    setFuelDate(log.log_date || '');
+  };
+
+  const openExpenseEdit = (expense) => {
+    setActiveTab('expenses');
+    setEditingExpenseId(expense.id);
+    setExpVehicleId(String(expense.vehicle_id || expense.vehicle?.id || expense.vehicle_detail?.id || ''));
+    setExpTripId(String(expense.trip_id || expense.trip?.id || ''));
+    setExpType(expense.expense_type || 'toll');
+    setExpAmount(String(expense.amount || ''));
+    setExpDate(expense.expense_date || '');
+    setRemarks(expense.description || '');
+  };
+
+  const handleDeleteFuel = async (id) => {
+    if (window.confirm('Delete this fuel log?')) {
+      await deleteFuelLog(id);
+      fetchData();
+    }
+  };
+
+  const handleDeleteExpense = async (id) => {
+    if (window.confirm('Delete this expense log?')) {
+      await deleteExpense(id);
+      fetchData();
+    }
   };
 
   return (
@@ -327,12 +385,31 @@ export const FuelExpenses = () => {
                     />
                   </div>
 
-                  <button
-                    type="submit"
-                    className="w-full flex justify-center py-2.5 px-4 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    Log Fuel Audit
-                  </button>
+                  <div className="flex items-center gap-3">
+                    {editingFuelId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingFuelId(null);
+                          setFuelVehicleId('');
+                          setFuelTripId('');
+                          setLiters('');
+                          setFuelCost('');
+                          setFuelDate('');
+                        }}
+                        className="w-full flex justify-center py-2.5 px-4 border border-gray-200 text-on-surface hover:bg-gray-50 font-semibold rounded-xl text-sm cursor-pointer"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={!canCreateFuel}
+                      className="w-full flex justify-center py-2.5 px-4 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {editingFuelId ? 'Update Fuel Log' : 'Log Fuel Audit'}
+                    </button>
+                  </div>
                 </form>
               </div>
 
@@ -348,6 +425,7 @@ export const FuelExpenses = () => {
                         <th className="px-6 py-3.5">Liters</th>
                         <th className="px-6 py-3.5">Date</th>
                         <th className="px-6 py-3.5 text-right">Total Cost</th>
+                        <th className="px-6 py-3.5 text-center">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-150">
@@ -367,6 +445,14 @@ export const FuelExpenses = () => {
                           <td className="px-6 py-3.5 font-mono">{log.liters} L</td>
                           <td className="px-6 py-3.5 text-xs text-on-surface-variant">{log.log_date}</td>
                           <td className="px-6 py-3.5 text-right font-bold text-on-surface">{formatCurrency(log.cost)}</td>
+                          <td className="px-6 py-3.5 text-center">
+                            {canUpdateOwn && canDeleteOwn && getOwnerId(log) === user?.id && (
+                              <div className="flex items-center justify-center gap-2">
+                                <button onClick={() => openFuelEdit(log)} className="text-xs font-bold text-primary hover:underline cursor-pointer">Edit</button>
+                                <button onClick={() => handleDeleteFuel(log.id)} className="text-xs font-bold text-error hover:underline cursor-pointer">Delete</button>
+                              </div>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -490,12 +576,32 @@ export const FuelExpenses = () => {
                     />
                   </div>
 
-                  <button
-                    type="submit"
-                    className="w-full flex justify-center py-2.5 px-4 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    Log Expense
-                  </button>
+                  <div className="flex items-center gap-3">
+                    {editingExpenseId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingExpenseId(null);
+                          setExpVehicleId('');
+                          setExpTripId('');
+                          setExpType('toll');
+                          setExpAmount('');
+                          setExpDate('');
+                          setRemarks('');
+                        }}
+                        className="w-full flex justify-center py-2.5 px-4 border border-gray-200 text-on-surface hover:bg-gray-50 font-semibold rounded-xl text-sm cursor-pointer"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={!canCreateExpense}
+                      className="w-full flex justify-center py-2.5 px-4 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {editingExpenseId ? 'Update Expense' : 'Log Expense'}
+                    </button>
+                  </div>
                 </form>
               </div>
 
@@ -511,6 +617,7 @@ export const FuelExpenses = () => {
                         <th className="px-6 py-3.5">Remarks</th>
                         <th className="px-6 py-3.5">Date</th>
                         <th className="px-6 py-3.5 text-right">Amount</th>
+                        <th className="px-6 py-3.5 text-center">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-150">
@@ -530,6 +637,14 @@ export const FuelExpenses = () => {
                           <td className="px-6 py-3.5 text-xs text-on-surface-variant truncate max-w-xs">{exp.description}</td>
                           <td className="px-6 py-3.5 text-xs text-on-surface-variant">{exp.expense_date}</td>
                           <td className="px-6 py-3.5 text-right font-bold text-on-surface">{formatCurrency(exp.amount)}</td>
+                          <td className="px-6 py-3.5 text-center">
+                            {canUpdateOwn && canDeleteOwn && getOwnerId(exp) === user?.id && (
+                              <div className="flex items-center justify-center gap-2">
+                                <button onClick={() => openExpenseEdit(exp)} className="text-xs font-bold text-primary hover:underline cursor-pointer">Edit</button>
+                                <button onClick={() => handleDeleteExpense(exp.id)} className="text-xs font-bold text-error hover:underline cursor-pointer">Delete</button>
+                              </div>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>

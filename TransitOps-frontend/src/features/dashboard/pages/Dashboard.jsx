@@ -63,7 +63,7 @@ export const Dashboard = () => {
   const utilizationData = [
     { name: 'Mon', rate: 68 },
     { name: 'Tue', rate: 72 },
-    { name: 'Wed', rate: summary?.fleet_utilization || 75 },
+    { name: 'Wed', rate: summary?.fleet_utilization ?? summary?.fleet_utilization_percent ?? 75 },
     { name: 'Thu', rate: 78 },
     { name: 'Fri', rate: 82 },
     { name: 'Sat', rate: 60 },
@@ -76,13 +76,13 @@ export const Dashboard = () => {
     { name: 'Mar', fuel: 48000, maintenance: 25000 },
     { name: 'Apr', fuel: 61000, maintenance: 12000 },
     { name: 'May', fuel: 55000, maintenance: 30000 },
-    { name: 'Jun', fuel: summary?.fuel_cost || 42000, maintenance: summary?.maintenance_cost || 20000 }
+    { name: 'Jun', fuel: summary?.fuel_cost ?? 42000, maintenance: summary?.maintenance_cost ?? 20000 }
   ];
 
   const vehicleStatusData = [
     { name: 'Available', value: summary?.available_vehicles || 0, color: '#22C55E' },
     { name: 'On Trip', value: summary?.active_vehicles || 0, color: '#3B82F6' },
-    { name: 'In Shop', value: summary?.vehicles_in_shop || 0, color: '#F59E0B' }
+    { name: 'In Shop', value: summary?.vehicles_in_shop ?? summary?.vehicles_in_maintenance ?? 0, color: '#F59E0B' }
   ].filter(item => item.value > 0);
 
   const formatCurrency = (val) => {
@@ -201,7 +201,7 @@ export const Dashboard = () => {
         />
         <KPICard 
           title="Fleet Utilization" 
-          value={`${summary?.fleet_utilization ?? 0}%`} 
+          value={`${summary?.fleet_utilization ?? summary?.fleet_utilization_percent ?? 0}%`} 
           icon={Percent} 
           trend="up" 
           trendValue="Optimum"

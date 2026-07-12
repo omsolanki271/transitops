@@ -41,8 +41,15 @@ def calculate_dashboard_summary(vehicle_type=None, status=None, region=None):
         "active_vehicles": active_vehicles,
         "available_vehicles": available_vehicles,
         "vehicles_in_maintenance": vehicles_in_maintenance,
+        "vehicles_in_shop": vehicles_in_maintenance,
         "active_trips": active_trips,
         "pending_trips": pending_trips,
         "drivers_on_duty": drivers_on_duty,
-        "fleet_utilization_percent": fleet_utilization_percent
+        "fleet_utilization_percent": fleet_utilization_percent,
+        "fleet_utilization": fleet_utilization_percent,
+        "fuel_cost": 0,
+        "maintenance_cost": 0,
+        "operational_cost": 0,
+        "revenue": 0,
+        "roi": 0
     }

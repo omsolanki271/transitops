@@ -7,7 +7,7 @@ from core.exceptions import StateTransitionConflict
 from core.response import standard_response
 from .models import MaintenanceLog
 from .serializers import MaintenanceLogSerializer
-from .permissions import CanManageMaintenance
+from core.permissions import CanAccessMaintenance
 from .services import create_maintenance_log, close_maintenance_log
 
 class MaintenanceLogViewSet(viewsets.ModelViewSet):
@@ -17,7 +17,7 @@ class MaintenanceLogViewSet(viewsets.ModelViewSet):
     """
     queryset = MaintenanceLog.objects.all()
     serializer_class = MaintenanceLogSerializer
-    permission_classes = [CanManageMaintenance]
+    permission_classes = [CanAccessMaintenance]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_fields = ('status', 'vehicle')
     search_fields = ('maintenance_type', 'description', 'vehicle__registration_number')

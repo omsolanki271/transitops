@@ -1,10 +1,12 @@
 from django.db import models
+from django.conf import settings
 from apps.vehicles.models import Vehicle
 from apps.trips.models import Trip
 
 class FuelLog(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.PROTECT, related_name='fuel_logs')
     trip = models.ForeignKey(Trip, on_delete=models.PROTECT, null=True, blank=True, related_name='fuel_logs')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name='created_fuel_logs')
     liters = models.DecimalField(max_digits=10, decimal_places=2)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     log_date = models.DateField()
@@ -21,6 +23,7 @@ class Expense(models.Model):
     )
     
     vehicle = models.ForeignKey(Vehicle, on_delete=models.PROTECT, related_name='expenses')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name='created_expenses')
     expense_type = models.CharField(max_length=50, choices=EXPENSE_TYPE_CHOICES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     expense_date = models.DateField()

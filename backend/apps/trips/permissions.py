@@ -1,1 +1,1 @@
-from core.permissions import CanManageTrips
+from core.permissions import CanAccessTrips as CanManageTrips

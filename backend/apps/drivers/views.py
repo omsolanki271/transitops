@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 import datetime
@@ -7,7 +8,7 @@ import datetime
 from core.response import standard_response
 from .models import Driver
 from .serializers import DriverSerializer
-from .permissions import CanManageDrivers
+from core.permissions import CanAccessDrivers
 from .services import create_driver, update_driver
 
 class DriverViewSet(viewsets.ModelViewSet):
@@ -17,7 +18,7 @@ class DriverViewSet(viewsets.ModelViewSet):
     """
     queryset = Driver.objects.all()
     serializer_class = DriverSerializer
-    permission_classes = [CanManageDrivers]
+    permission_classes = [CanAccessDrivers]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_fields = ('status',)
     search_fields = ('name', 'license_number')
@@ -45,12 +46,49 @@ class DriverViewSet(viewsets.ModelViewSet):
         return standard_response(success=True, data=self.get_serializer(driver).data, status_code=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop('partial', True)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+
+        if request.user.role == 'safety_officer':
+            import decimal
+            allowed_fields = {'status', 'safety_score', 'license_expiry_date', 'license_number', 'license_category'}
+            
+            # Validate that they aren't changing any read-only/forbidden fields
+            for key, val in request.data.items():
+                if key not in allowed_fields and hasattr(instance, key):
+                    current_val = getattr(instance, key)
+                    if current_val is not None:
+                        # Compare date, decimal, or general values safely
+                        if isinstance(current_val, datetime.date):
+                            try:
+                                # handle YYYY-MM-DD
+                                d_val = datetime.datetime.strptime(str(val).split('T')[0], '%Y-%m-%d').date()
+                                if current_val != d_val:
+                                    raise PermissionDenied(f"Safety Officers are not allowed to modify '{key}'.")
+                            except Exception:
+                                if str(current_val) != str(val):
+                                    raise PermissionDenied(f"Safety Officers are not allowed to modify '{key}'.")
+                        elif isinstance(current_val, decimal.Decimal):
+                            try:
+                                if current_val != decimal.Decimal(str(val)):
+                                    raise PermissionDenied(f"Safety Officers are not allowed to modify '{key}'.")
+                            except Exception:
+                                if str(current_val) != str(val):
+                                    raise PermissionDenied(f"Safety Officers are not allowed to modify '{key}'.")
+                        else:
+                            if str(current_val) != str(val):
+                                raise PermissionDenied(f"Safety Officers are not allowed to modify '{key}'.")
+
+            # Filter data so only allowed fields are validated and updated
+            filtered_data = {k: v for k, v in request.data.items() if k in allowed_fields}
+            serializer = self.get_serializer(instance, data=filtered_data, partial=True)
+        else:
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+
         serializer.is_valid(raise_exception=True)
         driver = update_driver(instance, serializer.validated_data)
         return standard_response(success=True, data=self.get_serializer(driver).data, status_code=status.HTTP_200_OK)
+
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
