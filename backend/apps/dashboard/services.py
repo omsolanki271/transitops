@@ -1,6 +1,9 @@
+from django.db.models import Sum
 from apps.vehicles.models import Vehicle
 from apps.trips.models import Trip
 from apps.drivers.models import Driver
+from apps.fuel_expenses.models import FuelLog, Expense
+from apps.maintenance.models import MaintenanceLog
 
 def calculate_dashboard_summary(vehicle_type=None, status=None, region=None):
     """
@@ -37,6 +40,19 @@ def calculate_dashboard_summary(vehicle_type=None, status=None, region=None):
     if total_vehicles > 0:
         fleet_utilization_percent = round((active_vehicles / total_vehicles) * 100, 2)
 
+    # Dynamic financial rollups
+    fuel_cost = FuelLog.objects.filter(vehicle__in=vehicles).aggregate(total=Sum('cost'))['total'] or 0
+    maintenance_cost = MaintenanceLog.objects.filter(vehicle__in=vehicles).exclude(status='cancelled').aggregate(total=Sum('cost'))['total'] or 0
+    other_expenses = Expense.objects.filter(vehicle__in=vehicles).aggregate(total=Sum('amount'))['total'] or 0
+
+    operational_cost = fuel_cost + maintenance_cost + other_expenses
+    revenue = trips.filter(status='completed').aggregate(total=Sum('revenue'))['total'] or 0
+
+    total_acquisition_cost = vehicles.aggregate(total=Sum('acquisition_cost'))['total'] or 0
+    roi = 0.00
+    if total_acquisition_cost > 0:
+        roi = round(float((revenue - (maintenance_cost + fuel_cost)) / total_acquisition_cost) * 100, 2)
+
     return {
         "active_vehicles": active_vehicles,
         "available_vehicles": available_vehicles,
@@ -47,9 +63,9 @@ def calculate_dashboard_summary(vehicle_type=None, status=None, region=None):
         "drivers_on_duty": drivers_on_duty,
         "fleet_utilization_percent": fleet_utilization_percent,
         "fleet_utilization": fleet_utilization_percent,
-        "fuel_cost": 0,
-        "maintenance_cost": 0,
-        "operational_cost": 0,
-        "revenue": 0,
-        "roi": 0
+        "fuel_cost": float(fuel_cost),
+        "maintenance_cost": float(maintenance_cost),
+        "operational_cost": float(operational_cost),
+        "revenue": float(revenue),
+        "roi": float(roi)
     }
