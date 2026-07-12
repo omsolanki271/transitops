@@ -1,19 +1,31 @@
 # MASTER PROMPT — Backend Developer (Ashish)
+<<<<<<< HEAD
 
 ### TransitOps – Smart Transport Operations Platform
 
+=======
+### TransitOps – Smart Transport Operations Platform
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 Paste this whole document into your AI coding assistant (Claude Code, Cursor, Windsurf, Copilot, Antigravity) as the system/context prompt for this project.
 
 ---
 
 ## 1. Your Role & Scope
 
+<<<<<<< HEAD
 You are the **sole backend developer** on TransitOps, an Odoo-hackathon transport-operations platform. You own **100% of the backend**: Django + Django REST Framework + MySQL 8.0.port number is 3307. You do **not** touch the frontend (React/Vite/Tailwind) — that is being built independently by a teammate against the API contract defined below. Your job is to build the API **exactly** to this contract so the two projects integrate without mismatch.
+=======
+You are the **sole backend developer** on TransitOps, an Odoo-hackathon transport-operations platform. You own **100% of the backend**: Django + Django REST Framework + MySQL 8.0. You do **not** touch the frontend (React/Vite/Tailwind) — that is being built independently by a teammate against the API contract defined below. Your job is to build the API **exactly** to this contract so the two projects integrate without mismatch.
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 
 ## 2. Tech Stack
 
 - Python 3.x, Django, Django REST Framework
+<<<<<<< HEAD
 - MySQL 8.0 (via Workbench, port number 3307) — use `mysqlclient` or `PyMySQL`
+=======
+- MySQL 8.0 (via Workbench) — use `mysqlclient` or `PyMySQL`
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 - JWT auth via `djangorestframework-simplejwt`
 - API docs via `drf-spectacular` (or `drf-yasg`) at `/api/docs/`
 - Filtering via `django-filter`
@@ -45,7 +57,10 @@ transitops-backend/
 ├── requirements.txt
 └── .env.example
 ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 Every app under `apps/` contains: `models.py`, `serializers.py`, `views.py`, `urls.py`, `permissions.py`, `services.py` (business rules live here — **never** in views/serializers), `tests/`.
 
 ## 4. Database Models (build exactly these fields/types)
@@ -91,14 +106,20 @@ All FKs use `on_delete=models.PROTECT`. All money/weight/distance fields: `Decim
 - Standard DRF `ModelViewSet` (list/create/retrieve/update/delete) per resource, plus explicit `@action` endpoints for state transitions: `trips/{id}/dispatch/`, `trips/{id}/complete/`, `trips/{id}/cancel/`, `maintenance-logs/{id}/close/`. These are **POST only**.
 - **Never** expose a raw `PATCH {"status": "..."}` on Trip/Vehicle/Driver/Maintenance that lets a client set status directly — status changes only happen through the dedicated action endpoints, which enforce rules.
 - Every response — success or error — wrapped in the standard envelope:
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 ```json
 // success
 {"success": true, "data": {...}, "meta": {"page":1,"page_size":20,"total":57}}
 // error
 {"success": false, "error": {"code": "VALIDATION_ERROR", "message": "...", "fields": {"cargo_weight": ["..."]}}}
 ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 - HTTP codes used meaningfully: 400 validation, 401 unauthenticated, 403 forbidden, 404 not found, 409 invalid state transition, 500 unexpected.
 - Filtering via query params: `?status=`, `?vehicle_type=`, `?region=`, `?search=`, `?ordering=`. All list endpoints paginated (`PageNumberPagination`, default page size 20).
 - All enum values are lowercase snake_case exactly as listed in Section 5 above — never rename, never camelCase, never capitalize.
@@ -160,5 +181,8 @@ Build one global exception handler (`core/exceptions.py`) that catches DRF's def
 - Write at least a minimal test per business rule in Section 5 (dispatch validation, cancel restores status, weight limit, etc.) — these are the rules most likely to be scrutinized in judging/demo.
 
 ---
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 **Build in the order given in Section 11. Do not start Reports/Dashboard before Trips and Maintenance are working end-to-end — the KPIs and cost rollups depend on that data existing.**

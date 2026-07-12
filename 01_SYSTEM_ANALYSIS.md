@@ -1,7 +1,11 @@
 # TransitOps – Smart Transport Operations Platform
+<<<<<<< HEAD
 
 ## System Analysis & Architecture Document
 
+=======
+## System Analysis & Architecture Document
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 Prepared for: Ashish (Backend) & Om (Frontend) — Odoo Hackathon (8-hour build)
 
 > **Assumptions flagged up front** (I don't have access to your `public/ui-design/` Stitch images, your live repo folder tree, or the Excalidraw board — it's a live collaborative link, not a static file). Everything below is derived from the written problem statement. Where I had to make a judgment call, it's marked **[ASSUMPTION]**. Both devs should sanity-check these against the actual Stitch screens before building.
@@ -29,7 +33,10 @@ Two independently developed, loosely-coupled applications integrated through a v
 ## 2. Folder Structure
 
 ### Backend (`transitops-backend/`)
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 ```
 transitops-backend/
 ├── config/                        # Django project (settings, root urls, wsgi/asgi)
@@ -58,11 +65,17 @@ transitops-backend/
 ├── requirements.txt
 └── .env.example
 ```
+<<<<<<< HEAD
 
 Each app under `apps/` follows Django's standard internal layout: `models.py`, `serializers.py`, `views.py`, `urls.py`, `permissions.py`, `services.py` (business-rule logic lives here, not in views), `tests/`.
 
 ### Frontend (`transitops-frontend/`)
 
+=======
+Each app under `apps/` follows Django's standard internal layout: `models.py`, `serializers.py`, `views.py`, `urls.py`, `permissions.py`, `services.py` (business-rule logic lives here, not in views), `tests/`.
+
+### Frontend (`transitops-frontend/`)
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 ```
 transitops-frontend/
 ├── public/
@@ -91,13 +104,17 @@ transitops-frontend/
 ├── tailwind.config.js
 └── vite.config.js
 ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 Each folder inside `features/` contains: `pages/`, `components/`, and (optionally) a `hooks.js`/`api.js` local to that feature.
 
 ---
 
 ## 3. Modules
 
+<<<<<<< HEAD
 | Module              | Backend App     | Frontend Feature |
 | ------------------- | --------------- | ---------------- |
 | Auth & RBAC         | `users`         | `auth`           |
@@ -108,12 +125,25 @@ Each folder inside `features/` contains: `pages/`, `components/`, and (optionall
 | Maintenance         | `maintenance`   | `maintenance`    |
 | Fuel & Expense      | `fuel_expenses` | `fuel-expenses`  |
 | Reports & Analytics | `reports`       | `reports`        |
+=======
+| Module | Backend App | Frontend Feature |
+|---|---|---|
+| Auth & RBAC | `users` | `auth` |
+| Dashboard/KPIs | `dashboard` | `dashboard` |
+| Vehicle Registry | `vehicles` | `vehicles` |
+| Driver Management | `drivers` | `drivers` |
+| Trip Management | `trips` | `trips` |
+| Maintenance | `maintenance` | `maintenance` |
+| Fuel & Expense | `fuel_expenses` | `fuel-expenses` |
+| Reports & Analytics | `reports` | `reports` |
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 
 ---
 
 ## 4. Database Design (MySQL 8.0)
 
 **`users`**
+<<<<<<< HEAD
 
 - id (PK), email (unique), password (hashed), full_name, role (FK → roles or choice field — see §9), phone, is_active, date_joined
 
@@ -147,13 +177,43 @@ Each folder inside `features/` contains: `pages/`, `components/`, and (optionall
 
 **`documents`** _(bonus feature — vehicle document management)_
 
+=======
+- id (PK), email (unique), password (hashed), full_name, role (FK → roles or choice field — see §9), phone, is_active, date_joined
+
+**`roles`** *(if using a table instead of a choice field — recommended for RBAC extensibility)*
+- id, name (`fleet_manager`, `driver`, `safety_officer`, `financial_analyst`), description
+
+**`vehicles`**
+- id (PK), registration_number (unique, indexed), name_model, vehicle_type, max_load_capacity (decimal, kg), odometer (decimal, km), acquisition_cost (decimal), status (`available|on_trip|in_shop|retired`), region *(for dashboard filter — [ASSUMPTION], not explicitly in field list but required by §2 Dashboard filters)*, created_at, updated_at
+
+**`drivers`**
+- id (PK), user_id (FK → users, nullable — [ASSUMPTION]: a driver may or may not have login access), name, license_number (unique), license_category, license_expiry_date, contact_number, safety_score (int/decimal), status (`available|on_trip|off_duty|suspended`), created_at, updated_at
+
+**`trips`**
+- id (PK), source, destination, vehicle_id (FK), driver_id (FK), cargo_weight (decimal), planned_distance (decimal), actual_distance (decimal, nullable), final_odometer (decimal, nullable), fuel_consumed (decimal, nullable), status (`draft|dispatched|completed|cancelled`), created_by (FK → users), dispatched_at, completed_at, cancelled_at, created_at, updated_at
+
+**`maintenance_logs`**
+- id (PK), vehicle_id (FK), maintenance_type (e.g. Oil Change), description, cost (decimal), status (`active|closed`), started_at, closed_at (nullable), created_by, created_at, updated_at
+
+**`fuel_logs`**
+- id (PK), vehicle_id (FK), trip_id (FK, nullable), liters (decimal), cost (decimal), log_date, created_at
+
+**`expenses`**
+- id (PK), vehicle_id (FK), expense_type (`toll|maintenance|other`), amount (decimal), expense_date, description, created_at
+
+**`documents`** *(bonus feature — vehicle document management)*
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 - id (PK), vehicle_id (FK), document_type, file, expiry_date (nullable), uploaded_at
 
 ---
 
 ## 5. Relationships
 
+<<<<<<< HEAD
 - `User` 1—1 `Driver` (optional; a driver _may_ be a login user, or may be a records-only profile — confirm role model with team) **[ASSUMPTION]**
+=======
+- `User` 1—1 `Driver` (optional; a driver *may* be a login user, or may be a records-only profile — confirm role model with team) **[ASSUMPTION]**
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 - `Vehicle` 1—N `Trip`
 - `Driver` 1—N `Trip`
 - `Vehicle` 1—N `MaintenanceLog`
@@ -195,6 +255,7 @@ All FKs use `on_delete=PROTECT` (never CASCADE) — operational history must nev
 
 ### Role → Permission Matrix
 
+<<<<<<< HEAD
 | Action                        | Fleet Manager | Driver\*       | Safety Officer                | Financial Analyst |
 | ----------------------------- | ------------- | -------------- | ----------------------------- | ----------------- |
 | Manage Vehicles (CRUD)        | ✅            | ❌             | 👁 read-only                  | 👁 read-only      |
@@ -206,6 +267,19 @@ All FKs use `on_delete=PROTECT` (never CASCADE) — operational history must nev
 | Dashboard                     | ✅ all KPIs   | 👁 limited     | 👁 limited                    | 👁 financial KPIs |
 
 _\*Per the problem statement's own wording, "Driver" is described as the role that "creates trips, assigns vehicles and drivers" — this reads like it may actually mean a **Dispatcher/Operations** role rather than the literal truck driver. **[FLAG FOR TEAM]**: confirm this before building RBAC — it materially changes the permission matrix. The matrix above assumes the literal reading from the doc (driver-as-dispatcher) but names it `driver` to match the spec's terminology._
+=======
+| Action | Fleet Manager | Driver* | Safety Officer | Financial Analyst |
+|---|---|---|---|---|
+| Manage Vehicles (CRUD) | ✅ | ❌ | 👁 read-only | 👁 read-only |
+| Manage Drivers (CRUD) | ✅ | ❌ | ✅ (status/compliance fields) | 👁 read-only |
+| Create/Dispatch/Complete Trip | ✅ | ✅ | 👁 read-only | 👁 read-only |
+| Maintenance Logs | ✅ | ❌ | 👁 read-only | 👁 read-only |
+| Fuel/Expense Entry | ✅ | ✅ (own trips) | ❌ | 👁 read-only |
+| Reports & Analytics | 👁 | ❌ | 👁 (safety-related) | ✅ full |
+| Dashboard | ✅ all KPIs | 👁 limited | 👁 limited | 👁 financial KPIs |
+
+*\*Per the problem statement's own wording, "Driver" is described as the role that "creates trips, assigns vehicles and drivers" — this reads like it may actually mean a **Dispatcher/Operations** role rather than the literal truck driver. **[FLAG FOR TEAM]**: confirm this before building RBAC — it materially changes the permission matrix. The matrix above assumes the literal reading from the doc (driver-as-dispatcher) but names it `driver` to match the spec's terminology.*
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 
 ---
 
@@ -235,7 +309,10 @@ Stored as a `CharField` with `choices` on the `User` model (simpler than a separ
 ## 11. Development Order
 
 **Backend (Ashish)**
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 1. Project skeleton, settings split, MySQL connection, custom User model + JWT auth
 2. RBAC permission classes + role seed data
 3. Vehicles app (CRUD + validation)
@@ -248,7 +325,10 @@ Stored as a `CharField` with `choices` on the `User` model (simpler than a separ
 10. Swagger/OpenAPI docs, seed data, polish, error handling audit
 
 **Frontend (Om)**
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 1. Project skeleton, Tailwind setup, routing, layout shell (sidebar/topbar) from Stitch designs
 2. Auth pages (login) + protected routes + role-based nav
 3. Dashboard page (KPI cards + filters) — build against **mocked** API responses matching the contract (§28) until backend endpoints are live
@@ -297,7 +377,10 @@ All of the above live in **backend service-layer functions** (`apps/trips/servic
 ## 14. Shared Data Models (the contract both devs must agree on byte-for-byte)
 
 Enums (use these exact string values on both ends — case-sensitive):
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 - Vehicle status: `available`, `on_trip`, `in_shop`, `retired`
 - Driver status: `available`, `on_trip`, `off_duty`, `suspended`
 - Trip status: `draft`, `dispatched`, `completed`, `cancelled`
@@ -321,7 +404,10 @@ All dates: ISO-8601 (`YYYY-MM-DD`), all datetimes: ISO-8601 with timezone (`YYYY
 ## 16. Response Format (standard envelope — used on every endpoint)
 
 Success:
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 ```json
 {
   "success": true,
@@ -329,11 +415,17 @@ Success:
   "meta": { "page": 1, "page_size": 20, "total": 57 }
 }
 ```
+<<<<<<< HEAD
 
 `meta` only present on list endpoints.
 
 Error:
 
+=======
+`meta` only present on list endpoints.
+
+Error:
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 ```json
 {
   "success": false,
@@ -467,6 +559,7 @@ If a change to any of the above is genuinely needed mid-hackathon, it gets a 2-m
 
 ## 30. Risk Analysis
 
+<<<<<<< HEAD
 | Risk                                                                    | Impact                              | Mitigation                                                                                                                              |
 | ----------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | API contract drifts because devs work in isolation                      | High — integration fails at the end | Freeze §28 contract before coding; Swagger docs from hour 1; mid-point integration checkpoint                                           |
@@ -476,9 +569,23 @@ If a change to any of the above is genuinely needed mid-hackathon, it gets a 2-m
 | No shared UI reference beyond Stitch images (not machine-readable here) | Medium                              | Om builds directly from the Stitch images in `public/ui-design/`; treat as pixel reference, not literal asset                           |
 | MySQL decimal precision mismatches (cost/weight fields)                 | Low-Medium                          | Standardize `DecimalField(max_digits=10, decimal_places=2)` across all money/weight fields, documented in §14                           |
 | Over-scoping bonus features and running out of time for mandatory ones  | Medium                              | Mandatory deliverables (§7 of problem statement) always take priority over bonus features                                               |
+=======
+| Risk | Impact | Mitigation |
+|---|---|---|
+| API contract drifts because devs work in isolation | High — integration fails at the end | Freeze §28 contract before coding; Swagger docs from hour 1; mid-point integration checkpoint |
+| "Driver" role ambiguity (dispatcher vs. literal driver) | Medium — wrong RBAC built | Confirm reading with team immediately (§8 flag) before building permissions |
+| Status side-effects implemented differently on frontend vs backend | High — data corruption | All status transitions are backend-only dedicated endpoints; frontend never sets status directly |
+| 8-hour time budget vs. 30-item scope | High | Follow Development Order (§11) strictly; bonus features (PDF export, email reminders, dark mode, doc management) are last and droppable |
+| No shared UI reference beyond Stitch images (not machine-readable here) | Medium | Om builds directly from the Stitch images in `public/ui-design/`; treat as pixel reference, not literal asset |
+| MySQL decimal precision mismatches (cost/weight fields) | Low-Medium | Standardize `DecimalField(max_digits=10, decimal_places=2)` across all money/weight fields, documented in §14 |
+| Over-scoping bonus features and running out of time for mandatory ones | Medium | Mandatory deliverables (§7 of problem statement) always take priority over bonus features |
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 
 ---
 
 ### Summary
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0a846d502fc10570879c4a0c688f596898c666
 The architecture above gives both developers a single, frozen contract (Sections 14–17, 28–29) to build against independently. Backend owns all business-rule enforcement and state transitions; frontend owns presentation and UX, driven entirely by API responses. Next: the two Master Prompts, one per developer, ready to hand to an AI coding assistant.

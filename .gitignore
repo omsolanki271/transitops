@@ -94,3 +94,6 @@ pytest_cache/
 # ==========================================
 *.pid
 *.seed
+01_SYSTEM_ANALYSIS.md
+02_BACKEND_MASTER_PROMPT_ASHISH.md
+03_FRONTEND_MASTER_PROMPT_OM.md
