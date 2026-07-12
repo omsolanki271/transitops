@@ -3,7 +3,7 @@ import { getTrips, createTrip, dispatchTrip, completeTrip, cancelTrip } from '..
 import { getVehicles } from '../../../api/vehicles';
 import { getDrivers } from '../../../api/drivers';
 import { StatusBadge } from '../../../components/common/StatusBadge';
-import { Search, Plus, MapPin, Navigation, Calendar, User, Truck, X, Eye, ShieldAlert, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Search, Plus, MapPin, Navigation, Calendar, User, Truck, X, Eye, ShieldAlert, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
 
 export const TripsList = () => {
   const [trips, setTrips] = useState([]);
@@ -38,14 +38,14 @@ export const TripsList = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [tripsRes, vehiclesRes, driversRes] = await Promise.all([
+      const [tripsResult, vehiclesResult, driversResult] = await Promise.allSettled([
         getTrips({ search, status: filterStatus }),
         getVehicles(),
         getDrivers()
       ]);
-      setTrips(tripsRes.data);
-      setVehicles(vehiclesRes.data);
-      setDrivers(driversRes.data);
+      if (tripsResult.status === 'fulfilled') setTrips(tripsResult.value.data);
+      if (vehiclesResult.status === 'fulfilled') setVehicles(vehiclesResult.value.data);
+      if (driversResult.status === 'fulfilled') setDrivers(driversResult.value.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -99,8 +99,8 @@ export const TripsList = () => {
     // Enforce business rule: Cargo Weight <= Vehicle Capacity
     if (vehicleId && cargoWeight) {
       const selectedVehicle = vehicles.find(v => v.id === parseInt(vehicleId));
-      if (selectedVehicle && parseFloat(cargoWeight) > selectedVehicle.max_load_capacity) {
-        errors.cargo_weight = [`Cargo exceeds vehicle capacity of ${selectedVehicle.max_load_capacity.toLocaleString()} kg`];
+      if (selectedVehicle && parseFloat(cargoWeight) > parseFloat(selectedVehicle.max_load_capacity)) {
+        errors.cargo_weight = [`Cargo exceeds vehicle capacity of ${parseFloat(selectedVehicle.max_load_capacity).toLocaleString()} kg`];
       }
     }
 
@@ -112,8 +112,8 @@ export const TripsList = () => {
     const payload = {
       source,
       destination,
-      vehicle_id: parseInt(vehicleId),
-      driver_id: parseInt(driverId),
+      vehicle: parseInt(vehicleId),
+      driver: parseInt(driverId),
       cargo_weight: parseFloat(cargoWeight),
       planned_distance: parseFloat(plannedDistance),
       revenue: parseFloat(revenue)
@@ -146,7 +146,8 @@ export const TripsList = () => {
   const openCompleteModal = (trip) => {
     setSelectedTrip(trip);
     // Suggest default values
-    const currentOdo = trip.vehicle_detail?.odometer || 0;
+    const vehicle = trip.vehicle_detail || trip.vehicle;
+    const currentOdo = vehicle?.odometer || 0;
     setFinalOdo(String(currentOdo + trip.planned_distance));
     setActualDistance(String(trip.planned_distance));
     setFuelConsumed(String(Math.round(trip.planned_distance / 3))); // Mock guess on fuel
@@ -166,7 +167,8 @@ export const TripsList = () => {
     if (!actualDistance || parseFloat(actualDistance) <= 0) errors.actual_distance = ['Actual distance is required'];
 
     // Enforce odometer must increase
-    const currentOdo = selectedTrip?.vehicle_detail?.odometer || 0;
+    const vehicle = selectedTrip?.vehicle_detail || selectedTrip?.vehicle;
+    const currentOdo = vehicle?.odometer || 0;
     if (parseFloat(finalOdo) <= currentOdo) {
       errors.final_odometer = [`Odometer must be greater than current vehicle odometer (${currentOdo.toLocaleString()} km)`];
     }
@@ -302,23 +304,23 @@ export const TripsList = () => {
               {/* Details grid */}
               <div className="grid grid-cols-2 gap-4 text-xs font-semibold">
                 {/* Vehicle */}
-                <div className="flex items-center gap-2 border border-gray-100 rounded-lg p-2.5">
+                <div className="flex items-center gap-2 border border-gray-150 rounded-lg p-2.5">
                   <Truck className="h-4 w-4 text-on-surface-variant" />
                   <div>
                     <p className="text-on-surface-variant text-[10px] uppercase font-bold tracking-wider leading-none">Vehicle</p>
-                    <p className="text-on-surface mt-1 truncate max-w-[150px]" title={trip.vehicle_detail?.name_model}>
-                      {trip.vehicle_detail ? `${trip.vehicle_detail.name_model} (${trip.vehicle_detail.registration_number})` : 'Unassigned'}
+                    <p className="text-on-surface mt-1 truncate max-w-[150px]" title={(trip.vehicle_detail || trip.vehicle)?.name_model}>
+                      {(trip.vehicle_detail || trip.vehicle) ? `${(trip.vehicle_detail || trip.vehicle).name_model} (${(trip.vehicle_detail || trip.vehicle).registration_number})` : 'Unassigned'}
                     </p>
                   </div>
                 </div>
 
                 {/* Driver */}
-                <div className="flex items-center gap-2 border border-gray-100 rounded-lg p-2.5">
+                <div className="flex items-center gap-2 border border-gray-150 rounded-lg p-2.5">
                   <User className="h-4 w-4 text-on-surface-variant" />
                   <div>
                     <p className="text-on-surface-variant text-[10px] uppercase font-bold tracking-wider leading-none">Driver</p>
                     <p className="text-on-surface mt-1 truncate max-w-[150px]">
-                      {trip.driver_detail ? trip.driver_detail.name : 'Unassigned'}
+                      {(trip.driver_detail || trip.driver) ? (trip.driver_detail || trip.driver).name : 'Unassigned'}
                     </p>
                   </div>
                 </div>
@@ -602,8 +604,8 @@ export const TripsList = () => {
 
               <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs text-on-surface-variant space-y-1">
                 <p className="font-bold text-on-surface">Vehicle Details:</p>
-                <p>Model: {selectedTrip.vehicle_detail?.name_model}</p>
-                <p>Starting Odometer: {selectedTrip.vehicle_detail?.odometer.toLocaleString()} km</p>
+                <p>Model: {(selectedTrip.vehicle_detail || selectedTrip.vehicle)?.name_model}</p>
+                <p>Starting Odometer: {(selectedTrip.vehicle_detail || selectedTrip.vehicle)?.odometer?.toLocaleString()} km</p>
                 <p>Planned Distance: {selectedTrip.planned_distance} km</p>
               </div>
 

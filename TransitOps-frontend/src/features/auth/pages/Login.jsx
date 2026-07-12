@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { ShieldCheck, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { isMockMode } from '../../../api/client';
 
 export const Login = () => {
   const { login } = useAuth();
@@ -26,8 +27,8 @@ export const Login = () => {
     setError('');
     setIsSubmitting(true);
     
-    // Attempt login (using mock mode by default for isolated demo setup)
-    const result = await login(email, password, true);
+    // Attempt login
+    const result = await login(email, password, isMockMode());
     
     setIsSubmitting(false);
     

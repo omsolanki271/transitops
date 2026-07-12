@@ -57,7 +57,7 @@ class TripViewSet(viewsets.ModelViewSet):
         return standard_response(success=True, data={"message": "Trip deleted successfully."}, status_code=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], url_path='dispatch')
-    def dispatch(self, request, pk=None):
+    def dispatch_trip_action(self, request, pk=None):
         """
         POST /api/v1/trips/{id}/dispatch/
         Transitions the trip status from draft to dispatched and marks vehicle and driver as on_trip.

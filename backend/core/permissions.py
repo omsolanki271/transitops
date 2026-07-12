@@ -31,27 +31,27 @@ class IsDriver(BasePermission):
 class IsFleetManagerOrReadOnly(BasePermission):
     """
     Vehicle module permission:
-    - Read: Fleet Manager, Safety Officer, Financial Analyst.
+    - Read: Fleet Manager, Safety Officer, Financial Analyst, Driver (needs to see vehicles when creating trips).
     - Write: Fleet Manager.
     """
     def has_permission(self, request, view):
         if not (request.user and request.user.is_authenticated):
             return False
         if request.method in SAFE_METHODS:
-            return request.user.role in ['fleet_manager', 'safety_officer', 'financial_analyst']
+            return request.user.role in ['fleet_manager', 'safety_officer', 'financial_analyst', 'driver']
         return request.user.role == 'fleet_manager'
 
 class CanManageDrivers(BasePermission):
     """
     Driver module permission:
-    - Read: Fleet Manager, Safety Officer, Financial Analyst.
+    - Read: Fleet Manager, Safety Officer, Financial Analyst, Driver (needs to see drivers when creating trips).
     - Write: Fleet Manager, Safety Officer.
     """
     def has_permission(self, request, view):
         if not (request.user and request.user.is_authenticated):
             return False
         if request.method in SAFE_METHODS:
-            return request.user.role in ['fleet_manager', 'safety_officer', 'financial_analyst']
+            return request.user.role in ['fleet_manager', 'safety_officer', 'financial_analyst', 'driver']
         return request.user.role in ['fleet_manager', 'safety_officer']
 
 class CanManageTrips(BasePermission):

@@ -40,14 +40,24 @@ export const Reports = () => {
 
       // 2. Calculate ROI report for each vehicle
       // ROI: (Revenue - (Maintenance + Fuel)) / Acquisition Cost * 100
+      const getVehicleId = (item) => {
+        if (!item) return null;
+        if (item.vehicle_id) return item.vehicle_id;
+        if (item.vehicle) {
+          return typeof item.vehicle === 'object' ? item.vehicle.id : item.vehicle;
+        }
+        return null;
+      };
+
       const calculatedRoi = vehiclesRes.data.map(v => {
-        const vFuel = fuelRes.data.filter(f => f.vehicle_id === v.id).reduce((sum, f) => sum + f.cost, 0);
-        const vExpenses = expensesRes.data.filter(e => e.vehicle_id === v.id).reduce((sum, e) => sum + e.amount, 0);
-        const vRevenue = tripsRes.data.filter(t => t.vehicle_id === v.id && t.status === 'completed').reduce((sum, t) => sum + (t.revenue || 0), 0);
+        const vFuel = fuelRes.data.filter(f => getVehicleId(f) === v.id).reduce((sum, f) => sum + parseFloat(f.cost || 0), 0);
+        const vExpenses = expensesRes.data.filter(e => getVehicleId(e) === v.id).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+        const vRevenue = tripsRes.data.filter(t => getVehicleId(t) === v.id && t.status === 'completed').reduce((sum, t) => sum + parseFloat(t.revenue || 0), 0);
         
+        const acquisitionCost = parseFloat(v.acquisition_cost) || 0;
         const returnVal = vRevenue - (vFuel + vExpenses);
-        const roi = v.acquisition_cost > 0 
-          ? parseFloat(((returnVal / v.acquisition_cost) * 100).toFixed(2)) 
+        const roi = acquisitionCost > 0 
+          ? parseFloat(((returnVal / acquisitionCost) * 100).toFixed(2)) 
           : 0;
 
         return {
@@ -56,7 +66,7 @@ export const Reports = () => {
           reg: v.registration_number,
           revenue: vRevenue,
           costs: vFuel + vExpenses,
-          costVal: v.acquisition_cost,
+          costVal: acquisitionCost,
           roi: roi
         };
       });
@@ -83,7 +93,8 @@ export const Reports = () => {
         csvContent = 'Trip ID,Vehicle,Route,Distance (km),Fuel (Liters),Efficiency (km/L)\n';
         completedTrips.forEach(t => {
           const efficiency = t.fuel_consumed > 0 ? (t.actual_distance / t.fuel_consumed).toFixed(2) : 0;
-          csvContent += `${t.id},${t.vehicle_detail?.registration_number},${t.source} to ${t.destination},${t.actual_distance},${t.fuel_consumed},${efficiency}\n`;
+          const vehicle = t.vehicle_detail || t.vehicle;
+          csvContent += `${t.id},${vehicle?.registration_number || 'N/A'},${t.source} to ${t.destination},${t.actual_distance},${t.fuel_consumed},${efficiency}\n`;
         });
       } else if (reportType === 'roi') {
         csvContent = 'Vehicle,Reg Number,Revenue,Operational Costs,Acquisition Cost,ROI (%)\n';
@@ -177,7 +188,7 @@ export const Reports = () => {
                     return (
                       <tr key={t.id} className="hover:bg-gray-50/50">
                         <td className="px-4 py-2.5">#{t.id} ({t.source.split(' ')[0]} ➔ {t.destination.split(' ')[0]})</td>
-                        <td className="px-4 py-2.5 font-mono text-primary">{t.vehicle_detail?.registration_number}</td>
+                        <td className="px-4 py-2.5 font-mono text-primary">{(t.vehicle_detail || t.vehicle)?.registration_number}</td>
                         <td className="px-4 py-2.5 text-right">{t.actual_distance} km</td>
                         <td className="px-4 py-2.5 text-right">{t.fuel_consumed} L</td>
                         <td className="px-4 py-2.5 text-right font-bold text-green-700">{eff} km/L</td>

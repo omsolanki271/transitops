@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import apiClient from '../api/client';
 
 const AuthContext = createContext(null);
 
@@ -57,9 +58,21 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(false);
         return { success: true };
       } else {
-        // Live login will be wired here with axios
-        // We will implement API endpoints later in api/client.js
-        throw new Error('Live API connection not configured yet');
+        const res = await apiClient.post('auth/login/', { email, password });
+        if (res.success && res.data) {
+          const { access, refresh, user: userData } = res.data;
+          
+          localStorage.setItem('transitops_token', access);
+          localStorage.setItem('transitops_refresh_token', refresh);
+          localStorage.setItem('transitops_user', JSON.stringify(userData));
+          
+          setToken(access);
+          setUser(userData);
+          setIsLoading(false);
+          return { success: true };
+        } else {
+          throw new Error(res.message || 'Login failed');
+        }
       }
     } catch (error) {
       setIsLoading(false);
