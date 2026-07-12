@@ -11,7 +11,7 @@ export const Topbar = () => {
   const getRoleLabel = (role) => {
     const roles = {
       fleet_manager: 'Fleet Manager',
-      driver: 'Driver / Dispatcher',
+      dispatcher: 'Dispatcher',
       safety_officer: 'Safety Officer',
       financial_analyst: 'Financial Analyst'
     };

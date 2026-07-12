@@ -16,8 +16,16 @@ export const AuthProvider = ({ children }) => {
     const savedUser = localStorage.getItem('transitops_user');
 
     if (savedToken && savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+
+      // Migrate stale 'driver' role to 'dispatcher' after the role rename
+      if (parsedUser.role === 'driver') {
+        parsedUser.role = 'dispatcher';
+        localStorage.setItem('transitops_user', JSON.stringify(parsedUser));
+      }
+
       setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+      setUser(parsedUser);
     }
     setIsLoading(false);
   }, []);
@@ -30,9 +38,9 @@ export const AuthProvider = ({ children }) => {
         let role = 'fleet_manager'; // Default role
         let name = 'Om Solanki';
 
-        if (email.includes('driver')) {
-          role = 'driver';
-          name = 'John Doe (Driver)';
+        if (email.includes('dispatcher') || email.includes('driver')) {
+          role = 'dispatcher';
+          name = 'John Doe (Dispatcher)';
         } else if (email.includes('safety')) {
           role = 'safety_officer';
           name = 'Jane Smith (Safety)';

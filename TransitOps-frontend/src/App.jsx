@@ -36,7 +36,7 @@ function App() {
             <Route 
               path="vehicles" 
               element={
-                <ProtectedRoute allowedRoles={['fleet_manager', 'safety_officer', 'financial_analyst']}>
+                <ProtectedRoute allowedRoles={['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']}>
                   <VehiclesList />
                 </ProtectedRoute>
               } 
@@ -45,7 +45,7 @@ function App() {
             <Route 
               path="drivers" 
               element={
-                <ProtectedRoute allowedRoles={['fleet_manager', 'safety_officer', 'financial_analyst']}>
+                <ProtectedRoute allowedRoles={['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']}>
                   <DriversList />
                 </ProtectedRoute>
               } 
@@ -65,7 +65,7 @@ function App() {
             <Route 
               path="expenses" 
               element={
-                <ProtectedRoute allowedRoles={['fleet_manager', 'driver', 'financial_analyst']}>
+                <ProtectedRoute allowedRoles={['fleet_manager', 'financial_analyst']}>
                   <FuelExpenses />
                 </ProtectedRoute>
               } 

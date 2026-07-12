@@ -31,7 +31,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('fleet_manager', 'Fleet Manager'),
-        ('driver', 'Driver'),
+        ('dispatcher', 'Dispatcher'),
         ('safety_officer', 'Safety Officer'),
         ('financial_analyst', 'Financial Analyst'),
     )

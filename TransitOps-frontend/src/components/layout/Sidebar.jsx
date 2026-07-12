@@ -26,25 +26,25 @@ export const Sidebar = () => {
       name: 'Dashboard',
       path: '/dashboard',
       icon: LayoutDashboard,
-      allowedRoles: ['fleet_manager', 'driver', 'safety_officer', 'financial_analyst']
+      allowedRoles: ['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']
     },
     {
       name: 'Vehicles',
       path: '/vehicles',
       icon: Truck,
-      allowedRoles: ['fleet_manager', 'safety_officer', 'financial_analyst']
+      allowedRoles: ['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']
     },
     {
       name: 'Drivers',
       path: '/drivers',
       icon: Users,
-      allowedRoles: ['fleet_manager', 'safety_officer', 'financial_analyst']
+      allowedRoles: ['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']
     },
     {
       name: 'Trips',
       path: '/trips',
       icon: Map,
-      allowedRoles: ['fleet_manager', 'driver', 'safety_officer', 'financial_analyst']
+      allowedRoles: ['fleet_manager', 'dispatcher', 'safety_officer', 'financial_analyst']
     },
     {
       name: 'Maintenance',
@@ -56,7 +56,7 @@ export const Sidebar = () => {
       name: 'Fuel & Expenses',
       path: '/expenses',
       icon: Receipt,
-      allowedRoles: ['fleet_manager', 'driver', 'financial_analyst']
+      allowedRoles: ['fleet_manager', 'financial_analyst']
     },
     {
       name: 'Reports & Analytics',

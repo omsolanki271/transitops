@@ -147,10 +147,10 @@ export const Login = () => {
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickFill('driver@transitops.com')}
+                onClick={() => handleQuickFill('dispatcher@transitops.com')}
                 className="px-2.5 py-2 border border-gray-200 rounded-md text-xs font-medium text-on-surface bg-gray-50 hover:bg-gray-100 hover:border-gray-300 transition-colors duration-150 cursor-pointer"
               >
-                Driver
+                Dispatcher
               </button>
               <button
                 type="button"

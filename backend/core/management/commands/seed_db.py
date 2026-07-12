@@ -36,11 +36,11 @@ class Command(BaseCommand):
         )
         
         # Driver
-        driver_user = User.objects.create_user(
-            email='driver@transitops.com',
+        dispatcher_user = User.objects.create_user(
+            email='dispatcher@transitops.com',
             password='password123',
-            full_name='John Doe (Driver)',
-            role='driver',
+            full_name='John Doe (Dispatcher)',
+            role='dispatcher',
             phone='9876543210'
         )
 
@@ -109,7 +109,7 @@ class Command(BaseCommand):
 
         self.stdout.write('Creating drivers...')
         d1 = Driver.objects.create(
-            user=driver_user,
+            user=dispatcher_user,
             name='John Doe',
             license_number='DL-2023-0001',
             license_category='heavy_vehicle',
